@@ -24,6 +24,11 @@ export default {
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
+				'automotive-blue': 'hsl(var(--automotive-blue))',
+				'automotive-blue-dark': 'hsl(var(--automotive-blue-dark))',
+				'automotive-silver': 'hsl(var(--automotive-silver))',
+				'automotive-dark': 'hsl(var(--automotive-dark))',
+				'automotive-accent': 'hsl(var(--automotive-accent))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
