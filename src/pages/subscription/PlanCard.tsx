@@ -14,12 +14,13 @@ interface PlanCardProps {
   standardDownloads: number;
   duration: number;
   description?: string;
+  features?: string[];
+  popular?: boolean;
+  bestValue?: boolean;
   onBuy: () => void;
   isActive: boolean;
   isLoggedIn: boolean;
-  large?: boolean;
-  accent?: "green" | "purple" | "yellow" | "orange" | "blue";
-  badge?: string;
+  loading?: boolean;
 }
 
 const PlanCard: React.FC<PlanCardProps> = ({
@@ -30,12 +31,13 @@ const PlanCard: React.FC<PlanCardProps> = ({
   standardDownloads,
   duration,
   description,
+  features = [],
+  popular = false,
+  bestValue = false,
   onBuy,
   isActive,
   isLoggedIn,
-  large = false,
-  accent,
-  badge,
+  loading = false
 }) => {
   const isFree = type === "FREE";
 
@@ -60,17 +62,32 @@ const PlanCard: React.FC<PlanCardProps> = ({
 
   const isDisabled = isActive;
 
+  const getCardStyle = () => {
+    if (bestValue) return "border-yellow-400 bg-gradient-to-br from-yellow-50 to-orange-50 shadow-lg";
+    if (popular) return "border-purple-400 bg-gradient-to-br from-purple-50 to-pink-50 shadow-lg";
+    if (isFree) return "border-green-400 bg-gradient-to-br from-green-50 to-emerald-50";
+    return "border-border bg-card hover:shadow-md";
+  };
+
+  const getBadge = () => {
+    if (bestValue) return "BEST VALUE";
+    if (popular) return "POPULAR";
+    if (isFree) return "FREE";
+    return null;
+  };
+
+  const badgeText = getBadge();
+
   return (
     <motion.div
-      className={`relative border-2 rounded-3xl shadow-md flex flex-col justify-between items-center text-center ${
-        large ? "w-full min-h-[460px] p-8" : "w-full p-5"
-      } ${accent ? `bg-${accent}-50 border-${accent}-500` : "bg-white border-gray-200"}`}
-      whileHover={{ scale: 1.03 }}
+      className={`relative rounded-2xl p-6 transition-all duration-300 ${getCardStyle()}`}
+      whileHover={{ scale: 1.02, y: -4 }}
+      whileTap={{ scale: 0.98 }}
     >
-      {(badge || isFree) && (
-        <div className="absolute top-5 left-5">
-          <Badge variant={badge || isFree ? "success" : "primary"}>
-            {badge || (isFree ? "FREE" : "")}
+      {badgeText && (
+        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+          <Badge variant={bestValue ? "primary" : popular ? "secondary" : "success"}>
+            {badgeText}
           </Badge>
         </div>
       )}
