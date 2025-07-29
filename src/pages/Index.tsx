@@ -1,18 +1,26 @@
-import Header from "@/components/Header";
-import HeroSection from "@/components/HeroSection";
-import SearchSection from "@/components/SearchSection";
-import FeaturedCars from "@/components/FeaturedCars";
-import ContactSection from "@/components/ContactSection";
-import Footer from "@/components/Footer";
+
+import React from 'react';
+import Header from '@/components/Header';
+import Hero from '@/components/Hero';
+import TrendingCategories from '@/components/TrendingCategories';
+import FeaturedCollections from '@/components/FeaturedCollections';
+
+import UserStats from '@/components/UserStats';
+import WhyChooseUs from '@/components/WhyChooseUs';
+import Newsletter from '@/components/Newsletter';
+import Footer from '@/components/Footer';
 
 const Index = () => {
   return (
     <div className="min-h-screen">
       <Header />
-      <HeroSection />
-      <SearchSection />
-      <FeaturedCars />
-      <ContactSection />
+      <Hero />
+      <TrendingCategories />
+      <FeaturedCollections />
+      
+      <UserStats />
+      <WhyChooseUs />
+      <Newsletter />
       <Footer />
     </div>
   );

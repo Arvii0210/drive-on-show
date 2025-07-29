@@ -1,72 +1,106 @@
-import { Car, Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
+import React from 'react';
+import {
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+  Youtube,
+  Mail,
+  Phone,
+  MapPin
+} from 'lucide-react';
+
+const plans = [
+  
+  'Standard Plan',
+  'Lite Plan',
+  'Premium Plan'
+];
+
+const socialLinks = [
+  { icon: Facebook, href: '#', label: 'Facebook' },
+  { icon: Twitter, href: '#', label: 'Twitter' },
+  { icon: Instagram, href: '#', label: 'Instagram' },
+  { icon: Linkedin, href: '#', label: 'LinkedIn' },
+  { icon: Youtube, href: '#', label: 'YouTube' }
+];
 
 const Footer = () => {
   return (
-    <footer className="bg-automotive-dark text-white">
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Company Info */}
-          <div className="space-y-6">
-            <div className="flex items-center gap-2">
-              <div className="bg-automotive-blue p-2 rounded-lg">
-                <Car className="h-6 w-6 text-white" />
-              </div>
-              <span className="text-xl font-bold">DreamCars</span>
-            </div>
-            <p className="text-gray-300 max-w-xs">
-              Your trusted partner in finding the perfect vehicle. Quality cars, competitive prices, exceptional service.
+    <footer className="bg-gray-900 text-white">
+      <div className="max-w-7xl mx-auto px-4 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+          {/* 📍 Address Info */}
+          <div>
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent mb-4">
+              Pextee
+            </h3>
+            <p className="text-gray-400 mb-6 leading-relaxed">
+              Your ultimate destination for high-quality creative assets.
             </p>
-            <div className="flex gap-4">
-              <Facebook className="h-5 w-5 hover:text-automotive-blue cursor-pointer transition-colors" />
-              <Twitter className="h-5 w-5 hover:text-automotive-blue cursor-pointer transition-colors" />
-              <Instagram className="h-5 w-5 hover:text-automotive-blue cursor-pointer transition-colors" />
-              <Linkedin className="h-5 w-5 hover:text-automotive-blue cursor-pointer transition-colors" />
+            <div className="space-y-3 text-sm text-gray-400">
+              <div className="flex items-center">
+                <Mail size={16} className="mr-3 text-teal-400" />
+                <span>hello@pextee.com</span>
+              </div>
+              <div className="flex items-center">
+                <Phone size={16} className="mr-3 text-teal-400" />
+                <span>+1 (555) 123-4567</span>
+              </div>
+              <div className="flex items-center">
+                <MapPin size={16} className="mr-3 text-teal-400" />
+                <span>Tamil Nadu</span>
+              </div>
             </div>
           </div>
 
-          {/* Quick Links */}
+          {/* 📝 Plans Section */}
           <div>
-            <h3 className="text-lg font-semibold mb-6">Quick Links</h3>
+            <h4 className="text-lg font-semibold mb-4">Plans</h4>
             <ul className="space-y-3">
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Inventory</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Financing</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Trade-In</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Service</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">About Us</a></li>
+              {plans.map((plan) => (
+                <li key={plan}>
+                  <a
+                    href="#"
+                    className="text-gray-400 hover:text-teal-400 transition-colors duration-300 text-sm"
+                  >
+                    {plan}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Services */}
+          {/* 📲 Follow Us */}
           <div>
-            <h3 className="text-lg font-semibold mb-6">Services</h3>
-            <ul className="space-y-3">
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Car Sales</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Auto Financing</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Vehicle Inspection</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Extended Warranty</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Insurance</a></li>
-            </ul>
-          </div>
-
-          {/* Contact Info */}
-          <div>
-            <h3 className="text-lg font-semibold mb-6">Contact</h3>
-            <div className="space-y-3 text-gray-300">
-              <p>123 Auto Plaza Drive<br />Cityville, ST 12345</p>
-              <p>Phone: (555) 123-4567</p>
-              <p>Email: info@dreamcars.com</p>
-              <div className="pt-4">
-                <p className="font-semibold text-white">Business Hours</p>
-                <p className="text-sm">Mon-Fri: 9AM-8PM</p>
-                <p className="text-sm">Sat: 9AM-6PM</p>
-                <p className="text-sm">Sun: 11AM-5PM</p>
-              </div>
+            <h4 className="text-lg font-semibold mb-4">Follow Us</h4>
+            <p className="text-gray-400 mb-4">
+              Stay connected with us for the latest updates.
+            </p>
+            <div className="flex space-x-4">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  className="bg-gray-800 hover:bg-teal-600 p-3 rounded-full transition-all duration-300 hover:scale-110"
+                  aria-label={social.label}
+                >
+                  <social.icon size={20} />
+                </a>
+              ))}
             </div>
           </div>
         </div>
 
-        <div className="border-t border-gray-700 mt-12 pt-8 text-center text-gray-400">
-          <p>&copy; 2024 DreamCars. All rights reserved. | Privacy Policy | Terms of Service</p>
+        {/* 🔻 Bottom Footer */}
+        <div className="border-t border-gray-800 pt-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
+            <p>&copy; 2024 Pextee. All rights reserved.</p>
+            <p>
+              Designed & Developed by{" "}
+              <span className="text-teal-300">Technovuz</span>
+            </p>
+          </div>
         </div>
       </div>
     </footer>
