@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMagnifyingGlass, faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { Search, ArrowRight } from "lucide-react";
 
 const Hero = () => {
   return (
@@ -35,10 +34,7 @@ const Hero = () => {
         <div className="mb-12">
           <div className="max-w-2xl mx-auto mb-8">
             <div className="flex items-center bg-white border border-gray-300 rounded-full px-4 py-3 shadow-lg focus-within:ring-2 focus-within:ring-teal-500 transition-all duration-300">
-              <FontAwesomeIcon
-                icon={faMagnifyingGlass}
-                className="text-gray-500 text-lg mr-3"
-              />
+              <Search className="text-gray-500 w-5 h-5 mr-3" />
               <input
                 type="text"
                 placeholder="Search for photos, vectors, illustrations..."
@@ -57,7 +53,7 @@ const Hero = () => {
               className="inline-flex items-center bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 hover:scale-105 shadow-lg"
             >
               Explore Now
-              <FontAwesomeIcon icon={faArrowRight} className="ml-3 text-sm" />
+              <ArrowRight className="ml-3 w-4 h-4" />
             </Link>
           </div>
         </div>

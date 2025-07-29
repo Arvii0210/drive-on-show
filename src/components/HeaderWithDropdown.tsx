@@ -1,13 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { ChevronDown, LogOut, Search, Camera } from "lucide-react";
-import {
-  faFilter,
-  faSort,
-  faChevronDown as faDown,
-  faChevronUp as faUp,
-  faCheck,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ChevronDown, LogOut, Search, Camera, Filter, ArrowUpDown, Check } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const filters = ["License", "AI-generated", "Orientation", "Color", "People", "File type"];
@@ -157,9 +149,9 @@ const HeaderWithDropdown = () => {
             }}
             className="flex items-center gap-2 text-base bg-gray-100 hover:bg-gray-200 px-5 py-2 rounded-full text-gray-800 font-medium transition"
           >
-            <FontAwesomeIcon icon={faFilter} />
+            <Filter className="w-4 h-4" />
             {selectedFilter || "Filters"}
-            <FontAwesomeIcon icon={filterOpen ? faUp : faDown} />
+            {filterOpen ? <ChevronDown className="w-4 h-4 rotate-180" /> : <ChevronDown className="w-4 h-4" />}
           </button>
           {filterOpen && (
             <div className="absolute mt-2 w-64 bg-white border shadow-xl rounded-xl z-50 p-4 space-y-2 transition-all duration-200 animate-fade-in">
@@ -174,7 +166,7 @@ const HeaderWithDropdown = () => {
                 >
                   {f}
                   {selectedFilter === f && (
-                    <FontAwesomeIcon icon={faCheck} className="text-blue-600" />
+                    <Check className="w-4 h-4 text-blue-600" />
                   )}
                 </button>
               ))}
@@ -191,9 +183,9 @@ const HeaderWithDropdown = () => {
             }}
             className="flex items-center gap-2 text-base bg-gray-100 hover:bg-gray-200 px-5 py-2 rounded-full text-gray-800 font-medium transition"
           >
-            <FontAwesomeIcon icon={faSort} />
+            <ArrowUpDown className="w-4 h-4" />
             {selectedSort}
-            <FontAwesomeIcon icon={sortOpen ? faUp : faDown} />
+            {sortOpen ? <ChevronDown className="w-4 h-4 rotate-180" /> : <ChevronDown className="w-4 h-4" />}
           </button>
           {sortOpen && (
             <div className="absolute mt-2 w-56 bg-white border shadow-xl rounded-xl z-50 p-4 space-y-3 transition-all duration-200 animate-fade-in">
@@ -211,7 +203,7 @@ const HeaderWithDropdown = () => {
                   />
                   {option}
                   {selectedSort === option && (
-                    <FontAwesomeIcon icon={faCheck} className="text-blue-600 ml-auto" />
+                    <Check className="w-4 h-4 text-blue-600 ml-auto" />
                   )}
                 </label>
               ))}
