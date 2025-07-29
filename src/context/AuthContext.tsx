@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 interface User {
+  id: string;
   name: string;
   email: string;
   avatar: string;
@@ -9,7 +10,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (userData: User) => void;
+  login: (userData: User, token: string) => void;
   logout: () => void;
 }
 
@@ -25,14 +26,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const login = (userData: User) => {
+  const login = (userData: User, token: string) => {
     setUser(userData);
     localStorage.setItem("pextee-user", JSON.stringify(userData));
+    localStorage.setItem("accessToken", token);
+    localStorage.setItem("userId", userData.id);
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem("pextee-user");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("userId");
   };
 
   return (
@@ -44,6 +49,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within AuthProvider");
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
   return context;
 };

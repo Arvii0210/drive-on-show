@@ -26,7 +26,7 @@ const PlanPage = () => {
             <Crown className="text-yellow-400" size={26} />
             No Active Plan
           </h2>
-          
+
           <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-8 text-center">
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               You don't have an active subscription plan.
@@ -41,11 +41,11 @@ const PlanPage = () => {
   }
 
   const remainingCredits = getRemainingCredits();
-  const standardUsed = userSubscription.standardCreditsUsed;
-  const premiumUsed = userSubscription.premiumCreditsUsed;
-  const standardTotal = userSubscription.plan.standardDownloads;
-  const premiumTotal = userSubscription.plan.premiumDownloads;
-  
+  const standardUsed = userSubscription.standardDownloadsUsed;
+  const premiumUsed = userSubscription.premiumDownloadsUsed;
+  const standardTotal = userSubscription.standardDownloadsTotal;
+  const premiumTotal = userSubscription.premiumDownloadsTotal;
+
   const standardProgress = standardTotal > 0 ? (standardUsed / standardTotal) * 100 : 0;
   const premiumProgress = premiumTotal > 0 ? (premiumUsed / premiumTotal) * 100 : 0;
 
@@ -64,9 +64,8 @@ const PlanPage = () => {
           Your Current Plan
         </h2>
 
-        {/* Plan Card */}
         <div className={`rounded-xl shadow-xl p-6 sm:p-8 text-white ${
-          userSubscription.plan.type === "FREE" 
+          userSubscription.plan.type === "FREE"
             ? "bg-gradient-to-br from-green-400 to-blue-500"
             : userSubscription.plan.type === "PREMIUM"
             ? "bg-gradient-to-br from-purple-500 to-pink-500"
@@ -86,7 +85,6 @@ const PlanPage = () => {
             </div>
           </div>
 
-          {/* Credits Usage */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             {standardTotal > 0 && (
               <div className="bg-white/10 rounded-lg p-4">
@@ -97,7 +95,7 @@ const PlanPage = () => {
                 <Progress value={standardProgress} className="h-2" />
               </div>
             )}
-            
+
             {premiumTotal > 0 && (
               <div className="bg-white/10 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
@@ -109,7 +107,6 @@ const PlanPage = () => {
             )}
           </div>
 
-          {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3">
             <Link to="/plans" className="flex-1">
               <Button variant="secondary" className="w-full">
@@ -126,7 +123,6 @@ const PlanPage = () => {
           </div>
         </div>
 
-        {/* Low Credits Warning */}
         {(remainingCredits.standard <= 2 || remainingCredits.premium <= 2) && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <p className="text-yellow-800 text-sm">

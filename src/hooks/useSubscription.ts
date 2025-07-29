@@ -1,123 +1,119 @@
 // src/hooks/useSubscription.ts
 import { useState, useEffect } from "react";
-import { getAllPlans, getUserSubscription } from "@/lib/subscriptionService";
+import {
+  getAllPlans,
+  getUserSubscription,
+  createSubscription as svcCreate,
+} from "@/lib/subscriptionService";
 import confetti from "canvas-confetti";
 import { useToast } from "@/hooks/use-toast";
 
-interface Plan {
-  id: string;
-  name: string;
-  displayName: string;
-  type: "FREE" | "PREMIUM" | "LITE";
-  price: number;
-  premiumDownloads: number;
-  standardDownloads: number;
-  duration: number;
-  description?: string;
-}
-
-interface UserSubscription {
-  id: string;
-  plan: Plan;
-  startDate: string;
-  endDate: string;
-  status: "ACTIVE" | "CANCELLED";
-  standardCreditsUsed: number;
-  premiumCreditsUsed: number;
-}
-
 export const useSubscription = () => {
-  const [plans, setPlans] = useState<Plan[]>([]);
-  const [userSubscription, setUserSubscription] = useState<UserSubscription | null>(null);
+  const [plans, setPlans] = useState<any[]>([]);
+  const [userSubscription, setUserSubscription] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { toast } = useToast();
 
-  const isLoggedIn = () => 
-    typeof window !== "undefined" && !!localStorage.getItem("accessToken");
+  const isLoggedIn = !!localStorage.getItem("accessToken");
 
-  const triggerConfetti = () => {
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 }
-    });
-  };
-
-  const createSubscription = async (planId: string) => {
-    if (!isLoggedIn()) return false;
-
-    try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch("/api/subscription", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({ planId })
-      });
-
-      if (response.ok) {
-        triggerConfetti();
-        toast({
-          title: "Success!",
-          description: "Your subscription has been activated! 🎉",
-        });
-        await fetchUserSubscription(); // Refresh subscription data
-        return true;
-      }
-      return false;
-    } catch (err) {
-      console.error("Failed to create subscription:", err);
-      return false;
-    }
-  };
+  const triggerConfetti = () =>
+    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
 
   const fetchPlans = async () => {
     try {
-      const plansData = await getAllPlans();
-      setPlans(plansData);
-    } catch (err) {
+      const data = await getAllPlans();
+      setPlans(data);
+      return data;
+    } catch {
       setError("Failed to load plans");
+      return [];
     }
   };
 
-  const fetchUserSubscription = async () => {
-    if (!isLoggedIn()) return;
+  const fetchUser = async () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const payload = JSON.parse(atob(token!.split(".")[1]));
+      const userId = payload?.id;
+      if (!userId) throw new Error("Missing userId");
+
+      const sub = await getUserSubscription(userId);
+      setUserSubscription(sub);
+      return sub;
+    } catch {
+      setUserSubscription(null);
+      return null;
+    }
+  };
+
+  const createSubscription = async (
+    planType: "FREE" | "PREMIUM" | "LITE" = "FREE"
+  ) => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      toast({
+        title: "Error",
+        description: "Not logged in",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const userId = payload?.id;
+
+    if (!userId) {
+      toast({
+        title: "Error",
+        description: "Invalid token",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
-      const subData = await getUserSubscription();
-      setUserSubscription(subData);
+      const ok = await svcCreate(userId, planType);
+      if (ok) {
+        triggerConfetti();
+        toast({ title: "Success!", description: "Plan activated 🎉" });
+        await fetchUser(); // Refresh active subscription
+        return true;
+      } else {
+        toast({
+          title: "Error",
+          description: "Activation failed",
+          variant: "destructive",
+        });
+        return false;
+      }
     } catch (err) {
-      console.error("Failed to fetch user subscription:", err);
+      toast({
+        title: "Error",
+        description: "Something went wrong",
+        variant: "destructive",
+      });
+      return false;
     }
   };
 
   const getRemainingCredits = () => {
     if (!userSubscription) return { standard: 0, premium: 0 };
-    
-    const standardRemaining = userSubscription.plan.standardDownloads - userSubscription.standardCreditsUsed;
-    const premiumRemaining = userSubscription.plan.premiumDownloads - userSubscription.premiumCreditsUsed;
-    
     return {
-      standard: Math.max(0, standardRemaining),
-      premium: Math.max(0, premiumRemaining)
+      standard: userSubscription.remainingStandardDownloads || 0,
+      premium: userSubscription.remainingPremiumDownloads || 0,
     };
   };
 
   useEffect(() => {
-    const loadData = async () => {
+    const init = async () => {
       setLoading(true);
-      await Promise.all([
-        fetchPlans(),
-        fetchUserSubscription()
-      ]);
+      await fetchPlans();
+      await fetchUser();
       setLoading(false);
     };
-
-    loadData();
-  }, []);
+    init();
+  }, [isLoggedIn]);
 
   return {
     plans,
@@ -125,8 +121,8 @@ export const useSubscription = () => {
     loading,
     error,
     createSubscription,
+    refreshSubscription: fetchUser,
     getRemainingCredits,
-    isLoggedIn: isLoggedIn(),
-    refreshSubscription: fetchUserSubscription
+    isLoggedIn,
   };
 };

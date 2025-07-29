@@ -5,9 +5,14 @@ import { twMerge } from "tailwind-merge";
 interface BadgeProps {
   children: React.ReactNode;
   variant?: "primary" | "secondary" | "success" | "danger";
+  className?: string;
 }
 
-export const Badge: React.FC<BadgeProps> = ({ children, variant = "primary" }) => {
+export const Badge: React.FC<BadgeProps> = ({
+  children,
+  variant = "primary",
+  className = "",
+}) => {
   return (
     <span
       className={twMerge(
@@ -15,7 +20,8 @@ export const Badge: React.FC<BadgeProps> = ({ children, variant = "primary" }) =
         variant === "primary" && "bg-blue-100 text-blue-800",
         variant === "secondary" && "bg-gray-200 text-gray-800",
         variant === "success" && "bg-green-100 text-green-800",
-        variant === "danger" && "bg-red-100 text-red-800"
+        variant === "danger" && "bg-red-100 text-red-800",
+        className
       )}
     >
       {children}

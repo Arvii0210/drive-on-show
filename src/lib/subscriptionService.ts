@@ -1,73 +1,57 @@
 // src/lib/subscriptionService.ts
 import axios from "axios";
 
-const api = axios.create({
-  baseURL: "http://localhost:3000/api/subscription-plans", // ✅ Correct path
+const subApi = axios.create({
+  baseURL: "http://localhost:3000/api/subscription",
   headers: { "Content-Type": "application/json" },
 });
 
-const normalizeType = (type?: string): "FREE" | "PREMIUM" | "LITE" => {
-  switch (type?.toUpperCase()) {
-    case "FREE":
-      return "FREE";
-    case "PLUS":
-    case "PRO":
-    case "ELITE":
-      return "PREMIUM";
-    case "LITE1":
-    case "LITE2":
-    default:
-      return "LITE";
+const plansApi = axios.create({
+  baseURL: "http://localhost:3000/api/subscription-plans",
+  headers: { "Content-Type": "application/json" },
+});
+
+subApi.interceptors.request.use((config) => {
+  const token = localStorage.getItem("accessToken");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
+  return config;
+});
+
+const normalizeType = (type?: string): "FREE" | "PREMIUM" | "LITE" => {
+  if (!type) return "LITE";
+  const t = type.toUpperCase();
+  if (t === "FREE") return "FREE";
+  if (["PLUS", "PRO", "ELITE", "PREMIUM"].includes(t)) return "PREMIUM";
+  return "LITE";
 };
 
 export const getAllPlans = async () => {
-  const res = await api.get("/plans");
-  const list: any[] = res.data?.data || [];
-
-  return list.map((plan) => ({
+  const res = await plansApi.get("/plans");
+  return (res.data.data || []).map((plan: any) => ({
     ...plan,
     type: normalizeType(plan.type),
   }));
 };
 
-export const createSubscription = async (planId: string) => {
-  const token = localStorage.getItem("accessToken");
-  if (!token) throw new Error("Not authenticated");
+export const getUserSubscription = async (userId: string) => {
+  const res = await subApi.get(`/user/${userId}`);
+  return res.data.data?.[0] ?? null;
+};
 
-  const res = await api.post("/", { planId }, {
-    headers: { Authorization: `Bearer ${token}` },
+export const createSubscription = async (
+  userId: string,
+  type: "FREE" | "PREMIUM" | "LITE" = "FREE"
+) => {
+  const plans = await getAllPlans();
+  const plan = plans.find((p) => p.type === type);
+  if (!plan) throw new Error(`No plan found for type: ${type}`);
+
+  const res = await subApi.post("/", {
+    userId: userId,
+    planId: plan.id,
   });
-  return res.data?.data;
-};
 
-export const getUserStats = async () => {
-  const token = localStorage.getItem("accessToken");
-  if (!token) return null;
-
-  try {
-    const userId = JSON.parse(atob(token.split('.')[1])).userId; // Extract from JWT
-    const res = await api.get(`/user/${userId}/stats`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return res.data?.data;
-  } catch (err) {
-    console.error("❌ Failed to fetch user stats", err);
-    return null;
-  }
-};
-
-export const getUserSubscription = async () => {
-  const token = typeof window !== "undefined" && localStorage.getItem("accessToken");
-  if (!token) return null;
-
-  try {
-    const res = await api.get("/me", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return res.data?.data;
-  } catch (err) {
-    console.error("❌ Failed to fetch user subscription", err);
-    return null;
-  }
+  return res.status === 201;
 };

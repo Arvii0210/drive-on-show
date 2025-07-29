@@ -1,9 +1,14 @@
-// src/components/PlanCard.tsx
 import React from "react";
+import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge2";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
-import { Sparkles, CheckCircle2, Check, Calendar, Gift } from "lucide-react";
+import {
+  Sparkles,
+  CheckCircle2,
+  Check,
+  Calendar,
+  Gift,
+} from "lucide-react";
 
 interface PlanCardProps {
   id: string;
@@ -21,6 +26,14 @@ interface PlanCardProps {
   accent?: "green" | "purple" | "yellow" | "orange" | "blue";
   badge?: string;
 }
+
+const accentClasses: Record<string, string> = {
+  green: "bg-green-50 border-green-500",
+  purple: "bg-purple-50 border-purple-500",
+  yellow: "bg-yellow-50 border-yellow-500",
+  orange: "bg-orange-50 border-orange-500",
+  blue: "bg-blue-50 border-blue-500",
+};
 
 const PlanCard: React.FC<PlanCardProps> = ({
   displayName,
@@ -43,11 +56,16 @@ const PlanCard: React.FC<PlanCardProps> = ({
     if (isActive) {
       return (
         <div className="flex items-center justify-center gap-2">
-          <Check className="h-4 w-4" /> Active
+          <Check className="h-4 w-4" />
+          Active Plan
         </div>
       );
     }
-    return isFree ? "Start for Free" : `Subscribe Now ₹${price}`;
+    return (
+      <div className="flex items-center justify-center gap-2">
+        {isFree ? "Start for Free" : `Switch to this Plan ₹${price}`}
+      </div>
+    );
   };
 
   const handleClick = () => {
@@ -58,19 +76,20 @@ const PlanCard: React.FC<PlanCardProps> = ({
     }
   };
 
-  const isDisabled = isActive;
+  const cardBaseClasses = `
+    relative border-2 rounded-3xl shadow-md transition-all duration-300 ease-in-out
+    flex flex-col justify-between items-center text-center
+  `;
+  const cardSize = large ? "w-full min-h-[460px] p-8" : "w-full p-5";
+  const cardAccent = accent ? accentClasses[accent] : "bg-white border-gray-200";
+  const cardClasses = `${cardBaseClasses} ${cardSize} ${cardAccent}`;
 
   return (
-    <motion.div
-      className={`relative border-2 rounded-3xl shadow-md flex flex-col justify-between items-center text-center ${
-        large ? "w-full min-h-[460px] p-8" : "w-full p-5"
-      } ${accent ? `bg-${accent}-50 border-${accent}-500` : "bg-white border-gray-200"}`}
-      whileHover={{ scale: 1.03 }}
-    >
+    <motion.div className={cardClasses} whileHover={{ scale: isActive ? 1 : 1.03 }}>
       {(badge || isFree) && (
         <div className="absolute top-5 left-5">
-          <Badge variant={badge || isFree ? "success" : "primary"}>
-            {badge || (isFree ? "FREE" : "")}
+          <Badge variant={badge ? "primary" : "success"}>
+            {badge || "FREE"}
           </Badge>
         </div>
       )}
@@ -80,34 +99,42 @@ const PlanCard: React.FC<PlanCardProps> = ({
         <div className="text-4xl font-extrabold text-indigo-700 mb-2">
           ₹{isFree ? 0 : price}
         </div>
-        <p className="text-gray-500 mb-4">{duration} {isFree ? "Days Free Access" : "Days Validity"}</p>
+        <p className="text-gray-500 mb-4">
+          {duration} {isFree ? "Days Free Access" : "Days Validity"}
+        </p>
 
         <div className="w-full text-left gap-2 mb-6">
           {premiumDownloads > 0 && (
             <div className="flex items-center gap-2 text-green-700">
-              <Sparkles size={18} /> {premiumDownloads} Premium Downloads
+              <Sparkles size={18} />
+              {premiumDownloads} Premium Downloads
             </div>
           )}
           {standardDownloads > 0 && (
             <div className="flex items-center gap-2 text-blue-700">
-              <CheckCircle2 size={18} /> {standardDownloads} Standard Downloads
+              <CheckCircle2 size={18} />
+              {standardDownloads} Standard Downloads
             </div>
           )}
           <div className="flex items-center gap-2 text-purple-700">
-            <Calendar size={18} /> {duration} Days Validity
+            <Calendar size={18} />
+            {duration} Days Validity
           </div>
           {description?.includes("🎁") && (
             <div className="flex items-center gap-2 text-red-700">
-              <Gift size={18} /> {description}
+              <Gift size={18} />
+              {description}
             </div>
           )}
         </div>
 
         <Button
-          className={`w-full py-3 text-lg ${isActive ? "bg-gray-100 text-gray-500 cursor-not-allowed" : ""}`}
           onClick={handleClick}
-          disabled={isDisabled}
-          variant={isFree && !isActive ? "secondary" : isActive ? "outline" : "default"}
+          disabled={isActive}
+          className={`w-full py-3 text-lg ${
+            isActive ? "bg-gray-100 text-gray-500 cursor-not-allowed" : ""
+          }`}
+          variant={isActive ? "outline" : isFree ? "secondary" : "default"}
         >
           {renderButtonText()}
         </Button>
