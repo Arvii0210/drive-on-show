@@ -1,118 +1,81 @@
-// Download management hook with API integration
+// src/hooks/useDownload.ts
 import { useState } from "react";
-import { downloadAPI } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 
 interface DownloadEligibility {
   canDownload: boolean;
   reason?: string;
   requiredPlan?: string;
-  hasCredits?: boolean;
-  creditType?: "standard" | "premium";
-}
-
-interface DownloadResult {
-  success: boolean;
-  remainingCredits?: {
-    standard: number;
-    premium: number;
-  };
-  message?: string;
 }
 
 export const useDownload = () => {
   const [downloading, setDownloading] = useState(false);
-  const [checking, setChecking] = useState(false);
   const { toast } = useToast();
 
-  const getUserId = () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return null;
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.userId || payload.sub;
-    } catch {
-      return null;
-    }
-  };
-
   const checkEligibility = async (assetId: string): Promise<DownloadEligibility> => {
-    setChecking(true);
-    
     try {
-      const response = await downloadAPI.checkEligibility(assetId);
-      const data = response.data?.data || response.data;
+      const token = localStorage.getItem("accessToken");
+      const response = await fetch(`/api/subscription/can-download/${assetId}`, {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        return await response.json();
+      }
       
-      return {
-        canDownload: data.canDownload || false,
-        reason: data.reason,
-        requiredPlan: data.requiredPlan,
-        hasCredits: data.hasCredits,
-        creditType: data.creditType
-      };
-    } catch (err: any) {
+      return { canDownload: false, reason: "Unable to check eligibility" };
+    } catch (err) {
       console.error("Failed to check download eligibility:", err);
-      return { 
-        canDownload: false, 
-        reason: err.response?.data?.message || "Unable to check eligibility" 
-      };
-    } finally {
-      setChecking(false);
+      return { canDownload: false, reason: "Network error" };
     }
   };
 
-  const recordDownload = async (
-    assetId: string, 
-    type: "standard" | "premium" = "standard"
-  ): Promise<DownloadResult> => {
+  const recordDownload = async (assetId: string, type: "standard" | "premium"): Promise<boolean> => {
     setDownloading(true);
     
     try {
-      const userId = getUserId();
-      if (!userId) {
-        throw new Error("User not authenticated");
+      const token = localStorage.getItem("accessToken");
+      const response = await fetch("/api/download/record", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ assetId, type })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        toast({
+          title: "Download Complete!",
+          description: `You have ${data.remainingCredits} ${type} credits left.`,
+        });
+        return true;
       }
-
-      const response = await downloadAPI.recordDownload({
-        userId,
-        assetId,
-        type
-      });
-
-      const data = response.data?.data || response.data;
       
-      toast({
-        title: "Download Complete! 🎉",
-        description: `You have ${data.remainingCredits?.standard || 0} standard and ${data.remainingCredits?.premium || 0} premium credits left.`,
-      });
-
-      return {
-        success: true,
-        remainingCredits: data.remainingCredits,
-        message: data.message
-      };
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || "Download failed";
-      
+      const errorData = await response.json();
       toast({
         title: "Download Failed",
-        description: errorMessage,
+        description: errorData.message || "Unable to download asset",
         variant: "destructive"
       });
-
-      return {
-        success: false,
-        message: errorMessage
-      };
+      return false;
+    } catch (err) {
+      console.error("Failed to record download:", err);
+      toast({
+        title: "Download Error",
+        description: "Network error occurred",
+        variant: "destructive"
+      });
+      return false;
     } finally {
       setDownloading(false);
     }
   };
 
-  const downloadAsset = async (
-    assetId: string, 
-    type: "standard" | "premium" = "standard"
-  ): Promise<boolean> => {
+  const downloadAsset = async (assetId: string, type: "standard" | "premium" = "standard") => {
     // Check eligibility first
     const eligibility = await checkEligibility(assetId);
     
@@ -126,29 +89,12 @@ export const useDownload = () => {
     }
 
     // Record the download
-    const result = await recordDownload(assetId, type);
-    return result.success;
-  };
-
-  const getUserDownloads = async () => {
-    const userId = getUserId();
-    if (!userId) return [];
-
-    try {
-      const response = await downloadAPI.getUserDownloads(userId);
-      return response.data?.data || response.data || [];
-    } catch (err: any) {
-      console.error("Failed to fetch user downloads:", err);
-      return [];
-    }
+    return await recordDownload(assetId, type);
   };
 
   return {
     downloadAsset,
     checkEligibility,
-    recordDownload,
-    getUserDownloads,
-    downloading,
-    checking
+    downloading
   };
 };
