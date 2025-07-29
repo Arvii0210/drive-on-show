@@ -1,97 +1,100 @@
-// src/components/DownloadButton.tsx
-import React, { useState } from "react";
+// Enhanced download button with full functionality
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Download, Lock, Crown } from "lucide-react";
+import { Download, Lock, Crown, Loader2 } from "lucide-react";
 import { useDownload } from "@/hooks/useDownload";
 import { useAuth } from "@/context/AuthContext";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
 
 interface DownloadButtonProps {
   assetId: string;
   type?: "standard" | "premium";
   className?: string;
   variant?: "default" | "outline" | "secondary";
+  showCreditsInfo?: boolean;
 }
 
 const DownloadButton: React.FC<DownloadButtonProps> = ({
   assetId,
   type = "standard",
   className = "",
-  variant = "default"
+  variant = "default",
+  showCreditsInfo = false
 }) => {
-  const { downloadAsset, downloading } = useDownload();
-  const { user } = useAuth();
   const [eligibility, setEligibility] = useState<any>(null);
-  const [checkingEligibility, setCheckingEligibility] = useState(false);
+  const [hasChecked, setHasChecked] = useState(false);
+  const { downloadAsset, checkEligibility, downloading, checking } = useDownload();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const checkEligibilityOnHover = async () => {
+    if (!hasChecked && user) {
+      setHasChecked(true);
+      const result = await checkEligibility(assetId);
+      setEligibility(result);
+    }
+  };
 
   const handleDownload = async () => {
     if (!user) {
-      // Redirect to login if not authenticated
-      window.location.href = "/login";
+      navigate("/login");
       return;
     }
 
     const success = await downloadAsset(assetId, type);
     if (success) {
-      // Optional: trigger actual file download here
-      // window.open(`/api/assets/${assetId}/download`, '_blank');
+      setHasChecked(false);
+      setEligibility(null);
     }
   };
 
-  const checkEligibilityOnHover = async () => {
-    if (!user || eligibility !== null || checkingEligibility) return;
-    
-    setCheckingEligibility(true);
-    try {
-      const response = await fetch(`/api/subscription/can-download/${assetId}`, {
-        headers: {
-          "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
-        }
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        setEligibility(data);
-      }
-    } catch (err) {
-      console.error("Failed to check eligibility:", err);
-    } finally {
-      setCheckingEligibility(false);
+  useEffect(() => {
+    if (user && !hasChecked) {
+      checkEligibilityOnHover();
     }
-  };
+  }, [user]);
 
   if (!user) {
     return (
-      <Link to="/login">
-        <Button variant={variant} className={className}>
-          <Lock className="w-4 h-4 mr-2" />
-          Login to Download
-        </Button>
-      </Link>
+      <Button onClick={() => navigate("/login")} className={className} variant={variant}>
+        <Lock className="h-4 w-4 mr-2" />
+        Login to Download
+      </Button>
+    );
+  }
+
+  if (checking) {
+    return (
+      <Button disabled className={className} variant={variant}>
+        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+        Checking...
+      </Button>
+    );
+  }
+
+  if (downloading) {
+    return (
+      <Button disabled className={className} variant={variant}>
+        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+        Downloading...
+      </Button>
     );
   }
 
   if (eligibility && !eligibility.canDownload) {
     return (
-      <Link to="/plans">
-        <Button variant="outline" className={className}>
-          <Crown className="w-4 h-4 mr-2" />
-          Upgrade to Download
-        </Button>
-      </Link>
+      <Button onClick={() => navigate("/plans")} className={className} variant="outline">
+        <Crown className="h-4 w-4 mr-2" />
+        Upgrade Plan
+      </Button>
     );
   }
 
   return (
-    <Button
-      variant={variant}
-      className={className}
-      onClick={handleDownload}
-      onMouseEnter={checkEligibilityOnHover}
-      disabled={downloading || checkingEligibility}
-    >
-      <Download className="w-4 h-4 mr-2" />
-      {downloading ? "Downloading..." : checkingEligibility ? "Checking..." : `Download ${type === "premium" ? "HD" : ""}`}
+    <Button onClick={handleDownload} className={className} variant={variant}>
+      <Download className="h-4 w-4 mr-2" />
+      {type === "premium" ? "Premium Download" : "Download"}
     </Button>
   );
 };
