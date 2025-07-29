@@ -31,6 +31,32 @@ export const getAllPlans = async () => {
   }));
 };
 
+export const createSubscription = async (planId: string) => {
+  const token = localStorage.getItem("accessToken");
+  if (!token) throw new Error("Not authenticated");
+
+  const res = await api.post("/", { planId }, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data?.data;
+};
+
+export const getUserStats = async () => {
+  const token = localStorage.getItem("accessToken");
+  if (!token) return null;
+
+  try {
+    const userId = JSON.parse(atob(token.split('.')[1])).userId; // Extract from JWT
+    const res = await api.get(`/user/${userId}/stats`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data?.data;
+  } catch (err) {
+    console.error("❌ Failed to fetch user stats", err);
+    return null;
+  }
+};
+
 export const getUserSubscription = async () => {
   const token = typeof window !== "undefined" && localStorage.getItem("accessToken");
   if (!token) return null;

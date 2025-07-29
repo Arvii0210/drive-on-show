@@ -2,10 +2,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PlanCard from "./PlanCard"; 
-import { getAllPlans, getUserSubscription } from "@/lib/subscriptionService";
+import { getAllPlans, getUserSubscription, createSubscription } from "@/lib/subscriptionService";
+import { useSubscription } from "@/hooks/useSubscription";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Info } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface Plan {
   id: string;
@@ -20,50 +22,35 @@ interface Plan {
 }
 
 const SubscriptionPlansPage: React.FC = () => {
-  const [plans, setPlans] = useState<Plan[]>([]);
-  const [activePlanId, setActivePlanId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const { plans, userSubscription, loading, error, createSubscription: createSub, isLoggedIn } = useSubscription();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const isLoggedIn = () =>
-    typeof window !== "undefined" && !!localStorage.getItem("accessToken");
+  const activePlanId = userSubscription?.plan?.id || null;
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const [plansRes, userSub] = await Promise.all([
-          getAllPlans(),
-          isLoggedIn() ? getUserSubscription() : Promise.resolve(null)
-        ]);
-
-        setPlans(plansRes);
-
-        if (isLoggedIn() && userSub?.plan?.id) {
-          setActivePlanId(userSub.plan.id);
-        } else {
-          setActivePlanId(null);
-        }
-      } catch {
-        setError("Failed to load plans");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchData();
-  }, []);
-
-  const handleBuy = (planId: string, type: string) => {
-    if (!isLoggedIn()) {
+  const handleBuy = async (planId: string, type: string) => {
+    if (!isLoggedIn) {
       navigate("/login");
       return;
     }
+    
     if (type === "FREE") {
-      // FREE plan auto-assigned—no further action
+      // Auto-assign FREE plan if user doesn't have it
+      if (!userSubscription || userSubscription.plan.type !== "FREE") {
+        try {
+          await createSub(planId);
+        } catch (err) {
+          toast({
+            title: "Error",
+            description: "Failed to activate free plan",
+            variant: "destructive"
+          });
+        }
+      }
       return;
     }
-    // go to payment, as configured by your backend
+    
+    // Redirect to payment for paid plans
     window.location.href = `/api/payments/checkout?planId=${planId}`;
   };
 
@@ -93,7 +80,7 @@ const SubscriptionPlansPage: React.FC = () => {
                   <PlanCard
                     {...starterPlan}
                     isActive={starterPlan.id === activePlanId}
-                    isLoggedIn={isLoggedIn()}
+                    isLoggedIn={isLoggedIn}
                     onBuy={() => handleBuy(starterPlan.id, starterPlan.type)}
                     accent="green"
                     badge="FREE"
@@ -113,7 +100,7 @@ const SubscriptionPlansPage: React.FC = () => {
                     key={plan.id}
                     {...plan}
                     isActive={plan.id === activePlanId}
-                    isLoggedIn={isLoggedIn()}
+                    isLoggedIn={isLoggedIn}
                     onBuy={() => handleBuy(plan.id, plan.type)}
                     accent={
                       plan.displayName === "Elite"
@@ -145,7 +132,7 @@ const SubscriptionPlansPage: React.FC = () => {
                     key={plan.id}
                     {...plan}
                     isActive={plan.id === activePlanId}
-                    isLoggedIn={isLoggedIn()}
+                    isLoggedIn={isLoggedIn}
                     onBuy={() => handleBuy(plan.id, plan.type)}
                     accent="blue"
                     badge={plan.displayName === "Lite 2" ? "GIFT" : undefined}
