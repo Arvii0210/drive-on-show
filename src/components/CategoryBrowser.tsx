@@ -15,10 +15,18 @@ const CategoryBrowser = () => {
         setLoading(true);
         setError(null);
         const data = await categoryService.getCategories();
-        setCategories(data);
+        // Ensure data is always an array
+        if (Array.isArray(data)) {
+          setCategories(data);
+        } else {
+          console.warn('API response is not an array:', data);
+          setCategories([]);
+          setError('Invalid data format received from server.');
+        }
       } catch (err) {
         setError('Failed to load categories. Please try again later.');
         console.error('Error fetching categories:', err);
+        setCategories([]); // Ensure categories remains an array
       } finally {
         setLoading(false);
       }
@@ -85,7 +93,7 @@ const CategoryBrowser = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {categories.map((category, index) => (
+          {Array.isArray(categories) && categories.length > 0 ? categories.map((category, index) => (
             <Link 
               key={category.id}
               to={`/asset-list?category=${encodeURIComponent(category.categoryName)}`}
@@ -119,7 +127,11 @@ const CategoryBrowser = () => {
                 </div>
               </div>
             </Link>
-          ))}
+          )) : (
+            <div className="col-span-full text-center py-12">
+              <p className="text-muted-foreground">No categories available at the moment.</p>
+            </div>
+          )}
         </div>
       </div>
     </section>
