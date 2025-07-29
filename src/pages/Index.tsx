@@ -2,7 +2,7 @@
 import React from 'react';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
-import TrendingCategories from '@/components/TrendingCategories';
+import CategoryBrowser from '@/components/CategoryBrowser';
 import FeaturedCollections from '@/components/FeaturedCollections';
 
 import UserStats from '@/components/UserStats';
@@ -15,7 +15,7 @@ const Index = () => {
     <div className="min-h-screen">
       <Header />
       <Hero />
-      <TrendingCategories />
+      <CategoryBrowser />
       <FeaturedCollections />
       
       <UserStats />

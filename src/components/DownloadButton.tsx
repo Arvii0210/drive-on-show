@@ -19,7 +19,7 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
   className = "",
   variant = "default"
 }) => {
-  const { downloadAsset, downloading } = useDownload();
+  const { downloadAsset, downloading } = useDownload(() => {});
   const { user } = useAuth();
   const [eligibility, setEligibility] = useState<any>(null);
   const [checkingEligibility, setCheckingEligibility] = useState(false);
