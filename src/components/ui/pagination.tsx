@@ -73,8 +73,8 @@ const Pagination: React.FC<PaginationProps> = ({
           size="sm"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={!hasPrev}
-        >
-          <ChevronLeft className="h-4 w-4" />
+  >
+    <ChevronLeft className="h-4 w-4" />
           Previous
         </Button>
         

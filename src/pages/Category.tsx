@@ -89,8 +89,29 @@ const CategoryPage = () => {
   // Assuming all categories here, or filter accordingly if you get category type
   const standardCategories = categories.filter(cat => {
     // Add your filtering logic here if you have type info e.g. cat.type === 'STANDARD'
-    return true; // show all for now
+    // For now, show all categories as standard
+    return true;
   });
+
+  const premiumCategories = categories.filter(cat => {
+    // Filter premium categories if you have a type field
+    // For now, we'll show all categories in both sections
+    return true;
+  });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white text-gray-900 font-sans">
+        <Header />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="flex items-center space-x-2">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+            <span>Loading categories...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white text-gray-900 font-sans">
@@ -133,13 +154,17 @@ const CategoryPage = () => {
                   className="group block rounded-lg shadow-lg border border-gray-200 overflow-hidden transform hover:-translate-y-1 hover:shadow-2xl transition-all duration-300"
                   aria-label={`View assets in category ${category.categoryName}`}
                 >
-                  <div className="aspect-[4/3] overflow-hidden">
+                  <div className="aspect-[4/3] overflow-hidden bg-gray-100">
                     <img
-                      src={category.imageUrl || 'https://images.unsplash.com/photo-1472396961693-142e6e269027?w=600&h=450&fit=crop'}
+                      src={category.imageUrl || '/placeholder.svg'}
                       alt={category.categoryName}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472396961693-142e6e269027?w=600&h=450&fit=crop';
+                        console.log('Image failed to load for category:', category.categoryName, 'URL:', category.imageUrl);
+                        (e.target as HTMLImageElement).src = '/placeholder.svg';
+                      }}
+                      onLoad={(e) => {
+                        console.log('Image loaded successfully for category:', category.categoryName);
                       }}
                     />
                   </div>
@@ -164,35 +189,79 @@ const CategoryPage = () => {
       <section className="py-16 px-6 md:px-12 lg:px-20 bg-gray-100">
         <h2 className="text-3xl font-bold mb-10 text-center">Standard Category Highlights</h2>
         <div className="max-w-7xl mx-auto columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6 space-y-6">
-          {standardCategories.filter(cat => cat.imageUrl).map((category) => (
+          {standardCategories.map((category) => (
               <Link
-                to={`/photos?categoryId=${category.id}`}
+                to={`/photos?categoryId=${category.id}&isPremium=false`}
                 key={`standard-${category.id}`}
                 className="block rounded-lg shadow-lg overflow-hidden cursor-pointer hover:shadow-2xl transition-shadow duration-300 break-inside-avoid"
               aria-label={`View standard assets in category ${category.categoryName}`}
             >
-              <img
-                src={category.imageUrl!}
-                alt={`Category ${category.categoryName}`}
-                className="w-full rounded-t-lg object-cover aspect-[4/3] hover:scale-105 transition-transform duration-500"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472396961693-142e6e269027?w=600&h=450&fit=crop';
-                }}
-              />
-              {(() => {
-                const assetCount = category._count?.assets ?? 0;
-                console.log(`Category "${category.categoryName}" has ${assetCount} assets`);
-                return (
-                  <div className="p-4 bg-white">
-                    <h3 className="text-lg font-semibold text-gray-900">{category.categoryName}</h3>
-                    <p className="text-sm text-gray-600">{assetCount.toLocaleString()} assets</p>
-                  </div>
-                );
-              })()}
+              <div className="aspect-[4/3] overflow-hidden bg-gray-100">
+                <img
+                  src={category.imageUrl || '/placeholder.svg'}
+                  alt={`Category ${category.categoryName}`}
+                  className="w-full rounded-t-lg object-cover hover:scale-105 transition-transform duration-500"
+                  onError={(e) => {
+                    console.log('Masonry image failed to load for category:', category.categoryName, 'URL:', category.imageUrl);
+                    (e.target as HTMLImageElement).src = '/placeholder.svg';
+                  }}
+                  onLoad={(e) => {
+                    console.log('Masonry image loaded successfully for category:', category.categoryName);
+                  }}
+                />
+              </div>
+              <div className="p-4 bg-white">
+                <h3 className="text-lg font-semibold text-gray-900">{category.categoryName}</h3>
+                <p className="text-sm text-gray-600">
+                  {category._count?.assets?.toLocaleString() || 0} assets
+                </p>
+              </div>
             </Link>
           ))}
           {standardCategories.length === 0 && (
             <p className="text-center text-gray-500 text-lg py-20">No standard categories available.</p>
+          )}
+        </div>
+      </section>
+
+      {/* Masonry Grid for Premium Category Images */}
+      <section className="py-16 px-6 md:px-12 lg:px-20 bg-gradient-to-r from-yellow-50 to-orange-50">
+        <h2 className="text-3xl font-bold mb-10 text-center">Premium Category Highlights</h2>
+        <div className="max-w-7xl mx-auto columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6 space-y-6">
+          {premiumCategories.map((category) => (
+              <Link
+                to={`/photos?categoryId=${category.id}&isPremium=true`}
+                key={`premium-${category.id}`}
+                className="block rounded-lg shadow-lg overflow-hidden cursor-pointer hover:shadow-2xl transition-shadow duration-300 break-inside-avoid"
+              aria-label={`View premium assets in category ${category.categoryName}`}
+            >
+              <div className="aspect-[4/3] overflow-hidden bg-gray-100 relative">
+                <img
+                  src={category.imageUrl || '/placeholder.svg'}
+                  alt={`Category ${category.categoryName}`}
+                  className="w-full rounded-t-lg object-cover hover:scale-105 transition-transform duration-500"
+                  onError={(e) => {
+                    console.log('Premium masonry image failed to load for category:', category.categoryName, 'URL:', category.imageUrl);
+                    (e.target as HTMLImageElement).src = '/placeholder.svg';
+                  }}
+                  onLoad={(e) => {
+                    console.log('Premium masonry image loaded successfully for category:', category.categoryName);
+                  }}
+                />
+                <div className="absolute top-2 right-2 bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                  Premium
+                </div>
+              </div>
+              <div className="p-4 bg-white">
+                <h3 className="text-lg font-semibold text-gray-900">{category.categoryName}</h3>
+                <p className="text-sm text-gray-600">
+                  {category._count?.assets?.toLocaleString() || 0} assets
+                </p>
+              </div>
+            </Link>
+          ))}
+          {premiumCategories.length === 0 && (
+            <p className="text-center text-gray-500 text-lg py-20">No premium categories available.</p>
           )}
         </div>
       </section>

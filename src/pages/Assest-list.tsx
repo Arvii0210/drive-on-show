@@ -116,15 +116,20 @@ const AssetList = () => {
   }, [toast]);
 
   const handleSearch = useCallback(async () => {
+    console.log('handleSearch called with filters:', filters);
+    
     // If no search criteria, fetch all assets
     if (!filters.q.trim() && !filters.categoryId && !filters.isPremium) {
+      console.log('No filters, fetching all assets');
       await fetchAssets();
       return;
     }
 
     // If there's only premium filter but no search query, fetch all assets and filter client-side
     if (!filters.q.trim() && !filters.categoryId && filters.isPremium) {
+      console.log('Only premium filter, fetching all assets and filtering client-side');
       setSearchLoading(true);
+      setLoading(false); // Set main loading to false since we're using searchLoading
       try {
         const data = await assetService.getAssets();
         let filteredAssets = Array.isArray(data) ? data : [];
@@ -136,6 +141,7 @@ const AssetList = () => {
           filteredAssets = filteredAssets.filter(asset => !asset.isPremium);
         }
         
+        console.log('Premium filtered assets:', filteredAssets);
         setAssets(filteredAssets);
       } catch (error) {
         toast({
@@ -154,10 +160,11 @@ const AssetList = () => {
     if (!filters.q.trim() && filters.categoryId) {
       console.log('Fetching assets for category:', filters.categoryId);
       setSearchLoading(true);
+      setLoading(false); // Set main loading to false since we're using searchLoading
       try {
         const response = await assetService.getAssetsByCategory(filters.categoryId);
         console.log('Category response:', response);
-        let filteredAssets = response.assets;
+        let filteredAssets = response.assets || [];
         
         // Apply premium filter client-side if needed
         if (filters.isPremium === "true") {
@@ -169,8 +176,19 @@ const AssetList = () => {
         console.log('Final filtered assets:', filteredAssets);
         console.log('Setting assets state with:', filteredAssets.length, 'assets');
         setAssets(filteredAssets);
-        setPagination(response.pagination);
-        setAvailableFilters(response.filters.available);
+        setPagination(response.pagination || {
+          page: 1,
+          limit: filteredAssets.length,
+          total: filteredAssets.length,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        });
+        setAvailableFilters(response.filters?.available || {
+          categories: [],
+          fileTypes: [],
+          tags: [],
+        });
       } catch (error) {
         console.error("Category filtering failed:", error);
         toast({
@@ -193,39 +211,56 @@ const AssetList = () => {
       return;
     }
 
-    setSearchLoading(true);
-    try {
-      const searchParams: SearchParams = {
-        q: filters.q.trim() || undefined,
-        category: filters.categoryId || undefined,
-        isPremium:
-          filters.isPremium === "true"
-            ? true
-            : filters.isPremium === "false"
-            ? false
-            : undefined,
-      };
-      
-             // Only call search API if there's a search query
-       if (filters.q.trim()) {
-         const response = await assetService.searchAssets(searchParams);
-         setAssets(response.assets);
-         setPagination(response.pagination);
-         setAvailableFilters(response.filters.available);
-       } else {
-         // This should not happen as we've handled all cases above
-         await fetchAssets();
-       }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to search assets. Please try again.",
-        variant: "destructive",
-      });
-      setAssets([]);
-    } finally {
-      setSearchLoading(false);
+    // If there's a search query, use search API
+    if (filters.q.trim()) {
+      console.log('Using search API with query:', filters.q);
+      setSearchLoading(true);
+      setLoading(false); // Set main loading to false since we're using searchLoading
+      try {
+        const searchParams: SearchParams = {
+          q: filters.q.trim() || undefined,
+          category: filters.categoryId || undefined,
+          isPremium:
+            filters.isPremium === "true"
+              ? true
+              : filters.isPremium === "false"
+              ? false
+              : undefined,
+        };
+        
+        const response = await assetService.searchAssets(searchParams);
+        console.log('Search response:', response);
+        setAssets(response.assets || []);
+        setPagination(response.pagination || {
+          page: 1,
+          limit: 0,
+          total: 0,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false,
+        });
+        setAvailableFilters(response.filters?.available || {
+          categories: [],
+          fileTypes: [],
+          tags: [],
+        });
+      } catch (error) {
+        console.error('Search failed:', error);
+        toast({
+          title: "Error",
+          description: "Failed to search assets. Please try again.",
+          variant: "destructive",
+        });
+        setAssets([]);
+      } finally {
+        setSearchLoading(false);
+      }
+      return;
     }
+
+    // Fallback: fetch all assets
+    console.log('Fallback: fetching all assets');
+    await fetchAssets();
   }, [filters, fetchAssets, toast]);
 
   // Update URL when filters change (for shareable URLs)
@@ -312,6 +347,18 @@ const AssetList = () => {
   console.log('Safe assets for rendering:', safeAssets);
   console.log('Safe assets length:', safeAssets.length);
   console.log('Safe assets type:', typeof safeAssets);
+  console.log('Loading state:', loading);
+  console.log('Search loading state:', searchLoading);
+  console.log('Current filters:', filters);
+  console.log('Should show loading screen:', loading);
+  console.log('Should show search loading:', searchLoading);
+  console.log('Should show assets:', !loading && !searchLoading && safeAssets.length > 0);
+  
+  // Debug: Log the first asset structure if available
+  if (safeAssets.length > 0) {
+    console.log('First asset structure:', safeAssets[0]);
+    console.log('First asset keys:', Object.keys(safeAssets[0]));
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -405,14 +452,35 @@ const AssetList = () => {
 
       {/* Results Count */}
       <div className="max-w-7xl mx-auto px-6 pb-4">
-        <p className="text-sm text-muted-foreground">
-          {safeAssets.length} asset{safeAssets.length !== 1 ? "s" : ""} found
-        </p>
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">
+            {searchLoading ? (
+              <span className="flex items-center space-x-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Loading assets...</span>
+              </span>
+            ) : (
+              `${safeAssets.length} asset${safeAssets.length !== 1 ? "s" : ""} found`
+            )}
+          </p>
+          {searchLoading && (
+            <div className="text-sm text-muted-foreground">
+              Please wait...
+            </div>
+          )}
+        </div>
       </div>
 
              {/* Masonry Grid Section */}
        <div className="max-w-7xl mx-auto px-6 pb-10">
-         {safeAssets.length === 0 ? (
+         {searchLoading ? (
+           <div className="text-center py-12">
+             <div className="flex items-center justify-center space-x-2">
+               <Loader2 className="h-6 w-6 animate-spin" />
+               <span>Loading assets...</span>
+             </div>
+           </div>
+         ) : safeAssets.length === 0 ? (
            <div className="text-center py-12">
              <p className="text-muted-foreground">
                No assets found. Try adjusting your search criteria.
@@ -433,13 +501,17 @@ const AssetList = () => {
                      className="w-full object-cover rounded-2xl hover:scale-105 transition duration-300"
                      style={{ height: `${200 + (idx % 3) * 50}px` }}
                      onError={(e) => {
+                       console.log('Image failed to load for asset:', item.title, 'URL:', item.src || item.thumbnail);
                        const target = e.target as HTMLImageElement;
                        target.src = '/placeholder.svg';
+                     }}
+                     onLoad={(e) => {
+                       console.log('Image loaded successfully for asset:', item.title);
                      }}
                    />
 
                   {/* Premium Badge */}
-                  {item.isPremium && (
+                  {(item.isPremium || item.assetCategory === 'PREMIUM') && (
                     <Badge className="absolute top-2 right-2 bg-yellow-500 hover:bg-yellow-600">
                       Premium
                     </Badge>
@@ -470,13 +542,13 @@ const AssetList = () => {
                   )}
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>By {item.author?.name ?? "Unknown"}</span>
-                                         <Badge variant="secondary" className="text-xs">
-                       {typeof item.category === 'string' ? item.category : item.category?.name || 'Unknown'}
-                     </Badge>
+                    <Badge variant="secondary" className="text-xs">
+                      {item.assetCategory || (typeof item.category === 'string' ? item.category : item.category?.name) || 'Unknown'}
+                    </Badge>
                   </div>
+                                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
                  )}
        </div>

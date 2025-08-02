@@ -20,6 +20,8 @@ export interface Asset {
     name: string;
     slug?: string;
   } | string; // Handle both object and string formats
+  categoryId?: string; // Direct category ID from API
+  assetCategory?: 'STANDARD' | 'PREMIUM'; // Asset category type
   fileType?: string;
   fileSize?: number;
   dimensions?: {
@@ -256,51 +258,69 @@ export const assetService = {
       console.log('Filtering by categoryId:', categoryId);
       
       const filteredAssets = allAssets.filter(asset => {
-        // Check for different possible category field names
-        const category = asset.category || (asset as any).categoryId || (asset as any).categoryName;
-        console.log('Asset category:', asset.title, category);
+        // Check for different possible category field names and structures
+        const category = asset.category || asset.categoryId || (asset as any).categoryName;
+        console.log('Asset:', asset.title, 'Category field:', category, 'CategoryId:', asset.categoryId);
         
-        if (!category) {
+        if (!category && !asset.categoryId) {
           console.log('No category for asset:', asset.title);
           return false;
         }
         
+        // Handle string category (direct category name or ID)
         if (typeof category === "string") {
-          const matches = category === categoryId;
+          const matches = category === categoryId || category.toLowerCase() === categoryId.toLowerCase();
           console.log('String category match:', category, '===', categoryId, '=', matches);
           return matches;
         }
         
-        // Handle different possible category object structures
-        const assetCategoryId = category.id || category.categoryId;
-        const assetCategoryName = category.name || category.categoryName;
+        // Handle category object with different possible field names
+        if (typeof category === "object" && category !== null) {
+          const assetCategoryId = category.id || category.categoryId || category._id;
+          const assetCategoryName = category.name || category.categoryName || category.title;
+          
+          const matches = assetCategoryId === categoryId || 
+                         assetCategoryName === categoryId ||
+                         assetCategoryName?.toLowerCase() === categoryId.toLowerCase();
+          
+          console.log('Object category match:', {
+            assetCategoryId,
+            assetCategoryName,
+            categoryId,
+            matches
+          });
+          return matches;
+        }
         
-        const matches = assetCategoryId === categoryId || assetCategoryName === categoryId;
-        console.log('Object category match:', assetCategoryId, '===', categoryId, 'OR', assetCategoryName, '===', categoryId, '=', matches);
-        return matches;
+        // Handle direct categoryId field
+        if (asset.categoryId) {
+          const matches = asset.categoryId === categoryId;
+          console.log('Direct categoryId match:', asset.categoryId, '===', categoryId, '=', matches);
+          return matches;
+        }
+        
+        return false;
       });
       
-      console.log('Filtered assets before return:', filteredAssets);
-      
-      // If no assets found, let's try a broader search
-      if (filteredAssets.length === 0) {
-        console.log('No assets found with exact category match, trying broader search...');
-        const broaderFiltered = allAssets.filter(asset => {
-          // Log all possible category-related fields
-          console.log('Asset full structure:', asset);
-          return false; // Don't return any for now, just log
-        });
-        console.log('Broader search results:', broaderFiltered);
-      }
-      
+      console.log('Filtered assets count:', filteredAssets.length);
       console.log('Filtered assets:', filteredAssets);
       
+      // Apply additional filters if provided
+      let finalAssets = filteredAssets;
+      if (params?.isPremium !== undefined) {
+        finalAssets = finalAssets.filter(asset => {
+          const isPremium = asset.isPremium || asset.assetCategory === 'PREMIUM';
+          return isPremium === params.isPremium;
+        });
+        console.log('After premium filter:', finalAssets.length, 'assets');
+      }
+      
       return {
-        assets: filteredAssets,
+        assets: finalAssets,
         pagination: {
           page: 1,
-          limit: filteredAssets.length,
-          total: filteredAssets.length,
+          limit: finalAssets.length,
+          total: finalAssets.length,
           totalPages: 1,
           hasNext: false,
           hasPrev: false,
