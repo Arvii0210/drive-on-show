@@ -102,7 +102,7 @@ const CategoryBrowser = () => {
             >
               <div className="aspect-[4/3] relative">
                 <img
-                  src={category.image || fallbackImage}
+                  src={category.imageUrl || fallbackImage}
                   alt={category.categoryName}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   onError={(e) => {

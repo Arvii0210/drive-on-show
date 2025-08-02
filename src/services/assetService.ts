@@ -29,7 +29,14 @@ export interface SearchParams {
   q?: string;
   category?: string;
   categoryId?: string;
+  categoryName?: string;
   isPremium?: boolean;
+  isFree?: boolean;
+  assetType?: 'STANDARD' | 'PREMIUM';
+  fileType?: string;
+  tags?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
   page?: number;
   limit?: number;
 }
