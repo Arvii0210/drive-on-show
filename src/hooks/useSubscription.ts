@@ -4,7 +4,9 @@ import {
   getAllPlans,
   getUserSubscription,
   createSubscription as svcCreate,
-} from "@/lib/subscriptionService";
+} from "@/lib/subscriptionService"; 
+
+
 import confetti from "canvas-confetti";
 import { useToast } from "@/hooks/use-toast";
 
@@ -34,15 +36,29 @@ export const useSubscription = () => {
   const fetchUser = async () => {
     try {
       const token = localStorage.getItem("accessToken");
-      const payload = JSON.parse(atob(token!.split(".")[1]));
+      if (!token) {
+        console.log("No access token found");
+        setUserSubscription(null);
+        return null;
+      }
+      
+      const payload = JSON.parse(atob(token.split(".")[1]));
       const userId = payload?.id;
-      if (!userId) throw new Error("Missing userId");
+      if (!userId) {
+        console.log("No userId found in token");
+        setUserSubscription(null);
+        return null;
+      }
 
+      console.log("Fetching subscription for userId:", userId);
       const sub = await getUserSubscription(userId);
+      console.log("Subscription data received:", sub);
       setUserSubscription(sub);
       return sub;
-    } catch {
-      setUserSubscription(null);
+    } catch (error) {
+      console.error("Error fetching user subscription:", error);
+      // Don't set userSubscription to null on error, keep existing state
+      // This prevents the UI from showing "Start for Free" when there's a network error
       return null;
     }
   };
@@ -77,7 +93,8 @@ export const useSubscription = () => {
       if (ok) {
         triggerConfetti();
         toast({ title: "Success!", description: "Plan activated 🎉" });
-        await fetchUser(); // Refresh active subscription
+        // Always fetch the latest subscription data, whether it was just created or already existed
+        await fetchUser();
         return true;
       } else {
         toast({
@@ -88,6 +105,7 @@ export const useSubscription = () => {
         return false;
       }
     } catch (err) {
+      console.error("Error creating subscription:", err);
       toast({
         title: "Error",
         description: "Something went wrong",

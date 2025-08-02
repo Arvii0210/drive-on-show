@@ -14,6 +14,7 @@ const SubscriptionPlansPage: React.FC = () => {
     loading,
     error,
     createSubscription,
+    refreshSubscription,
     isLoggedIn,
   } = useSubscription();
 
@@ -23,12 +24,30 @@ const SubscriptionPlansPage: React.FC = () => {
   const [activeId, setActiveId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (userSubscription?.plan?.id) {
-      setActiveId(userSubscription.plan.id);
-    } else if (userSubscription?.planId) {
-      setActiveId(userSubscription.planId);
+    // Check if user has an active subscription
+    if (userSubscription) {
+      // Try different ways to get the plan ID
+      let planId = null;
+      
+      if (userSubscription.plan?.id) {
+        planId = userSubscription.plan.id;
+      } else if (userSubscription.planId) {
+        planId = userSubscription.planId;
+      } else if (userSubscription.type === "FREE") {
+        // If user has a FREE subscription, find the free plan ID
+        const freePlan = plans.find(p => p.type === "FREE");
+        if (freePlan) {
+          planId = freePlan.id;
+        }
+      }
+      
+      if (planId) {
+        setActiveId(planId);
+      }
+    } else {
+      setActiveId(null);
     }
-  }, [userSubscription]);
+  }, [userSubscription, plans]);
 
   const handleBuy = async (planId: string, type: string) => {
     if (!isLoggedIn) {
@@ -50,6 +69,12 @@ const SubscriptionPlansPage: React.FC = () => {
         if (success) {
           toast({ title: "Free plan activated!" });
           setActiveId(planId);
+          console.log("Free plan activated, activeId set to:", planId);
+          
+          // Force refresh the user subscription to update the UI
+          setTimeout(async () => {
+            await refreshSubscription();
+          }, 1000);
         }
       } catch {
         toast({ title: "Error", description: "Activation failed", variant: "destructive" });

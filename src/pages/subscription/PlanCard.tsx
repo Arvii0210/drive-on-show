@@ -8,6 +8,9 @@ import {
   Check,
   Calendar,
   Gift,
+  Star,
+  Crown,
+  TrendingUp,
 } from "lucide-react";
 
 interface PlanCardProps {
@@ -27,14 +30,6 @@ interface PlanCardProps {
   badge?: string;
 }
 
-const accentClasses: Record<string, string> = {
-  green: "bg-green-50 border-green-500",
-  purple: "bg-purple-50 border-purple-500",
-  yellow: "bg-yellow-50 border-yellow-500",
-  orange: "bg-orange-50 border-orange-500",
-  blue: "bg-blue-50 border-blue-500",
-};
-
 const PlanCard: React.FC<PlanCardProps> = ({
   displayName,
   type,
@@ -47,7 +42,6 @@ const PlanCard: React.FC<PlanCardProps> = ({
   isActive,
   isLoggedIn,
   large = false,
-  accent,
   badge,
 }) => {
   const isFree = type === "FREE";
@@ -56,14 +50,14 @@ const PlanCard: React.FC<PlanCardProps> = ({
     if (isActive) {
       return (
         <div className="flex items-center justify-center gap-2">
-          <Check className="h-4 w-4" />
-          Active Plan
+          <Check className="h-5 w-5" />
+          {isFree ? "Activated" : "Active Plan"}
         </div>
       );
     }
     return (
       <div className="flex items-center justify-center gap-2">
-        {isFree ? "Start for Free" : `Switch to this Plan ₹${price}`}
+        {isFree ? "Start for Free" : `Choose Plan`}
       </div>
     );
   };
@@ -76,69 +70,100 @@ const PlanCard: React.FC<PlanCardProps> = ({
     }
   };
 
-  const cardBaseClasses = `
-    relative border-2 rounded-3xl shadow-md transition-all duration-300 ease-in-out
-    flex flex-col justify-between items-center text-center
-  `;
-  const cardSize = large ? "w-full min-h-[460px] p-8" : "w-full p-5";
-  const cardAccent = accent ? accentClasses[accent] : "bg-white border-gray-200";
-  const cardClasses = `${cardBaseClasses} ${cardSize} ${cardAccent}`;
+  // Card style: clean, white, subtle shadow, border, rounded
+  const cardSize = large ? "w-full min-h-[480px] p-8" : "w-full p-6";
+  const cardClasses = `relative rounded-2xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-md flex flex-col items-center transition-all duration-200 ${cardSize} ${isActive ? 'ring-2 ring-blue-500' : ''}`;
+
+  // Static badge (not floating/animated)
+  const staticBadge = badge ? (
+    <Badge
+      variant="primary"
+      className="absolute top-5 right-5 px-3 py-1 text-xs font-bold bg-yellow-400 text-white border-0"
+    >
+      {badge === "BEST VALUE" ? (
+        <Crown className="inline-block w-4 h-4 mr-1 -mt-1" />
+      ) : badge === "POPULAR" ? (
+        <TrendingUp className="inline-block w-4 h-4 mr-1 -mt-1" />
+      ) : null}
+      {badge}
+    </Badge>
+  ) : null;
+
+  // Plan icon
+  const planIcon = isFree ? (
+    <Sparkles className="w-8 h-8 text-blue-400" />
+  ) : (
+    <Star className="w-8 h-8 text-yellow-400" />
+  );
 
   return (
-    <motion.div className={cardClasses} whileHover={{ scale: isActive ? 1 : 1.03 }}>
-      {(badge || isFree) && (
-        <div className="absolute top-5 left-5">
-          <Badge variant={badge ? "primary" : "success"}>
-            {badge || "FREE"}
-          </Badge>
-        </div>
-      )}
+    <motion.div
+      className={cardClasses}
+      whileHover={{ scale: isActive ? 1 : 1.03, boxShadow: isActive ? undefined : "0 8px 32px 0 rgba(99,102,241,0.10)" }}
+      transition={{ type: "spring", stiffness: 300 }}
+    >
+      {/* Static Badge */}
+      {staticBadge}
 
-      <div className="w-full flex flex-col items-center">
-        <h3 className="text-2xl font-bold mb-1">{displayName}</h3>
-        <div className="text-4xl font-extrabold text-indigo-700 mb-2">
-          ₹{isFree ? 0 : price}
+      {/* Plan Icon */}
+      <div className="flex justify-center items-center mb-4 mt-2">
+        <div className="bg-gray-100 dark:bg-zinc-800 rounded-full p-3 shadow-sm">
+          {planIcon}
         </div>
-        <p className="text-gray-500 mb-4">
-          {duration} {isFree ? "Days Free Access" : "Days Validity"}
-        </p>
-
-        <div className="w-full text-left gap-2 mb-6">
-          {premiumDownloads > 0 && (
-            <div className="flex items-center gap-2 text-green-700">
-              <Sparkles size={18} />
-              {premiumDownloads} Premium Downloads
-            </div>
-          )}
-          {standardDownloads > 0 && (
-            <div className="flex items-center gap-2 text-blue-700">
-              <CheckCircle2 size={18} />
-              {standardDownloads} Standard Downloads
-            </div>
-          )}
-          <div className="flex items-center gap-2 text-purple-700">
-            <Calendar size={18} />
-            {duration} Days Validity
-          </div>
-          {description?.includes("🎁") && (
-            <div className="flex items-center gap-2 text-red-700">
-              <Gift size={18} />
-              {description}
-            </div>
-          )}
-        </div>
-
-        <Button
-          onClick={handleClick}
-          disabled={isActive}
-          className={`w-full py-3 text-lg ${
-            isActive ? "bg-gray-100 text-gray-500 cursor-not-allowed" : ""
-          }`}
-          variant={isActive ? "outline" : isFree ? "secondary" : "default"}
-        >
-          {renderButtonText()}
-        </Button>
       </div>
+
+      {/* Plan Name & Price */}
+      <h3 className="text-2xl font-bold text-center mb-1 text-gray-900 dark:text-white">
+        {displayName}
+      </h3>
+      <div className="text-center mb-2">
+        <span className="text-4xl font-extrabold text-gray-900 dark:text-white">
+          {isFree ? "Free" : `₹${price}`}
+        </span>
+      </div>
+      <p className="text-center text-gray-500 dark:text-gray-300 mb-4 text-base">
+        {duration} {isFree ? "Days Free Access" : "Days Validity"}
+      </p>
+
+      {/* Features List */}
+      <ul className="w-full mb-6 space-y-2">
+        {premiumDownloads > 0 && (
+          <li className="flex items-center gap-2 text-blue-700 font-medium">
+            <Sparkles size={18} />
+            {premiumDownloads} Premium Downloads
+          </li>
+        )}
+        {standardDownloads > 0 && (
+          <li className="flex items-center gap-2 text-green-700 font-medium">
+            <CheckCircle2 size={18} />
+            {standardDownloads} Standard Downloads
+          </li>
+        )}
+        <li className="flex items-center gap-2 text-purple-700 font-medium">
+          <Calendar size={18} />
+          {duration} Days Validity
+        </li>
+        {description?.includes("🎁") && (
+          <li className="flex items-center gap-2 text-pink-700 font-medium">
+            <Gift size={18} />
+            {description}
+          </li>
+        )}
+      </ul>
+
+      {/* Action Button */}
+      <Button
+        onClick={handleClick}
+        disabled={isActive}
+        className={`w-full py-3 text-base font-semibold rounded-xl shadow-sm transition-all duration-200 ${
+          isActive
+            ? "bg-gray-200 text-gray-500 border-gray-300 cursor-not-allowed"
+            : "bg-blue-600 hover:bg-blue-700 text-white"
+        }`}
+        variant={isActive ? "outline" : "default"}
+      >
+        {renderButtonText()}
+      </Button>
     </motion.div>
   );
 };

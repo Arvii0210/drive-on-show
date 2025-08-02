@@ -36,8 +36,28 @@ export const getAllPlans = async () => {
 };
 
 export const getUserSubscription = async (userId: string) => {
-  const res = await subApi.get(`/user/${userId}`);
-  return res.data.data?.[0] ?? null;
+  try {
+    console.log("Calling getUserSubscription for userId:", userId);
+    const res = await subApi.get(`/user/${userId}`);
+    console.log("API response:", res.data);
+    
+    const subscription = res.data.data?.[0] ?? null;
+    console.log("Extracted subscription:", subscription);
+    return subscription;
+  } catch (error: any) {
+    console.error("Error fetching user subscription:", error.response?.data || error.message);
+    console.error("Error status:", error.response?.status);
+    
+    // If it's a 409 error (user already has subscription), we should still try to get the subscription
+    if (error.response?.status === 409) {
+      console.log("User already has subscription, trying to fetch existing subscription...");
+      // You might need to call a different endpoint to get the existing subscription
+      // For now, we'll return null and let the frontend handle it
+      return null;
+    }
+    
+    throw error; // Re-throw other errors
+  }
 };
 
 export const createSubscription = async (
@@ -48,10 +68,18 @@ export const createSubscription = async (
   const plan = plans.find((p) => p.type === type);
   if (!plan) throw new Error(`No plan found for type: ${type}`);
 
-  const res = await subApi.post("/", {
-    userId: userId,
-    planId: plan.id,
-  });
-
-  return res.status === 201;
+  try {
+    const res = await subApi.post("/", {
+      userId: userId,
+      planId: plan.id,
+    });
+    return res.status === 201;
+  } catch (error: any) {
+    // If user already has a subscription (409 error), treat it as success
+    if (error.response?.status === 409) {
+      console.log("User already has an active subscription - treating as success");
+      return true; // Return true to indicate "success" even though subscription already exists
+    }
+    throw error; // Re-throw other errors
+  }
 };

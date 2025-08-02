@@ -6,6 +6,7 @@ interface User {
   name: string;
   email: string;
   avatar: string;
+  createdAt: string ;
 }
 
 interface AuthContextType {
@@ -28,6 +29,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = (userData: User, token: string) => {
     setUser(userData);
+    
     localStorage.setItem("pextee-user", JSON.stringify(userData));
     localStorage.setItem("accessToken", token);
     localStorage.setItem("userId", userData.id);
@@ -35,6 +37,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = () => {
     setUser(null);
+    
     localStorage.removeItem("pextee-user");
     localStorage.removeItem("accessToken");
     localStorage.removeItem("userId");

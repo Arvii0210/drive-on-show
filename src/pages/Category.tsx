@@ -1,31 +1,17 @@
 import React, { useState, useRef, useEffect } from "react";
-import { ChevronDown, LogOut, Search, Camera } from "lucide-react";
-import Header from "@/components/Header";
-
-import { useAuth } from "@/context/AuthContext";
 import { Link } from "react-router-dom";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { useAuth } from "@/context/AuthContext";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import Footer from "@/components/Footer";
-import { Category, categoryService } from '@/services/categoryService';
-import { Skeleton } from '@/components/ui/skeleton';
 
-const galleryImages = [
-  "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-  "https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13",
-  "https://images.unsplash.com/photo-1504198453319-5ce911bafcde",
-  "https://images.unsplash.com/photo-1510070009289-b5bc34383727",
-  "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70",
-  "https://images.unsplash.com/photo-1544005313-94ddf0286df2",
-  "https://images.unsplash.com/photo-1495567720989-cebdbdd97913",
-  "https://images.unsplash.com/photo-1497032205916-ac775f0649ae",
-  "https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d",
-  "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4",
-];
+import { Category, categoryService } from '@/services/categoryService';
 
 const faqData = [
   {
@@ -56,40 +42,33 @@ const faqData = [
     id: 5,
     question: "Do I need to give credit to photographers?",
     answer:
-      "While not always required, we encourage giving credit. Some free photos may require attribution – this is marked on each photo’s download page.",
+      "While not always required, we encourage giving credit. Some free photos may require attribution – this is marked on each photo's download page.",
   },
 ];
 
 const CategoryPage = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [searchText, setSearchText] = useState("");
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const profileRef = useRef(null);
+  const profileRef = useRef<HTMLDivElement | null>(null);
   const { user } = useAuth();
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         setLoading(true);
+        const cats = await categoryService.getCategories();
+        setCategories(cats);
         setError(null);
-        const data = await categoryService.getCategories();
-        if (Array.isArray(data)) {
-          setCategories(data);
-        } else {
-          setCategories([]);
-          setError('Invalid data format received from server.');
-        }
       } catch (err) {
-        setError('Failed to load categories. Please try again later.');
-        console.error('Error fetching categories:', err);
         setCategories([]);
+        setError('Failed to load categories');
+        console.error('Error fetching categories:', err);
       } finally {
         setLoading(false);
       }
     };
-
     fetchCategories();
   }, []);
 
@@ -97,7 +76,7 @@ const CategoryPage = () => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
         profileRef.current &&
-        !(profileRef.current as any).contains(e.target)
+        !profileRef.current.contains(e.target as Node)
       ) {
         setDropdownOpen(false);
       }
@@ -106,32 +85,37 @@ const CategoryPage = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Filter standard categories if you have a property that marks categories STANDARD
+  // Assuming all categories here, or filter accordingly if you get category type
+  const standardCategories = categories.filter(cat => {
+    // Add your filtering logic here if you have type info e.g. cat.type === 'STANDARD'
+    return true; // show all for now
+  });
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-white text-gray-900 font-sans">
       {/* Header */}
       <Header />
 
       {/* Hero */}
-      <section className="py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            The right photo for every moment
-          </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Surf categories of professional photos to express your ideas and
-            connect with your audience
-          </p>
-        </div>
+      <section className="py-20 px-6 md:px-12 lg:px-20 bg-gray-50 text-center">
+        <h1 className="text-5xl md:text-6xl font-extrabold mb-4 leading-tight max-w-4xl mx-auto">
+          The right photo for every moment
+        </h1>
+        <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+          Surf categories of professional photos to express your ideas and connect with your audience
+        </p>
       </section>
 
       {/* Category Grid */}
-      <section className="py-16 px-4">
-        <div className="max-w-6xl mx-auto">
+      <section className="py-16 px-6 md:px-12 lg:px-20">
+        <h2 className="text-3xl font-bold mb-8 text-center">Browse Categories</h2>
+        <div className="max-w-7xl mx-auto">
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...Array(6)].map((_, index) => (
-                <div key={index} className="bg-card border border-border rounded-lg overflow-hidden">
-                  <Skeleton className="aspect-[4/3] w-full" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="rounded-lg shadow border border-gray-200 overflow-hidden animate-pulse">
+                  <Skeleton className="aspect-video w-full" />
                   <div className="p-4">
                     <Skeleton className="h-6 w-3/4" />
                   </div>
@@ -139,81 +123,95 @@ const CategoryPage = () => {
               ))}
             </div>
           ) : error ? (
-            <div className="text-center py-12">
-              <p className="text-destructive">{error}</p>
-            </div>
+            <div className="text-center py-12 text-red-600 font-semibold text-lg">{error}</div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array.isArray(categories) && categories.length > 0 ? categories.map((category) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {categories.length > 0 ? categories.map((category) => (
                 <Link
-                  to={`/asset-list?category=${encodeURIComponent(category.categoryName)}`}
+                  to={`/photos?categoryId=${category.id}`}
                   key={category.id}
-                  className="group bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg transition hover:scale-105 cursor-pointer block"
+                  className="group block rounded-lg shadow-lg border border-gray-200 overflow-hidden transform hover:-translate-y-1 hover:shadow-2xl transition-all duration-300"
+                  aria-label={`View assets in category ${category.categoryName}`}
                 >
                   <div className="aspect-[4/3] overflow-hidden">
                     <img
-                      src={category.image || 'https://images.unsplash.com/photo-1472396961693-142e6e269027?w=400&h=300&fit=crop'}
+                      src={category.imageUrl || 'https://images.unsplash.com/photo-1472396961693-142e6e269027?w=600&h=450&fit=crop'}
                       alt={category.categoryName}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = 'https://images.unsplash.com/photo-1472396961693-142e6e269027?w=400&h=300&fit=crop';
+                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472396961693-142e6e269027?w=600&h=450&fit=crop';
                       }}
                     />
                   </div>
-                  <div className="p-4">
-                    <h3 className="text-lg font-semibold">{category.categoryName}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {category._count.assets.toLocaleString()} assets
+                  <div className="p-6 bg-white">
+                    <h3 className="text-xl font-semibold text-gray-900">{category.categoryName}</h3>
+                    <p className="mt-1 text-sm text-gray-600">
+                      {category._count?.assets?.toLocaleString() || 0} assets available
                     </p>
                   </div>
                 </Link>
               )) : (
-                <div className="col-span-full text-center py-12">
-                  <p className="text-muted-foreground">No categories available at the moment.</p>
-                </div>
+                <p className="text-center text-gray-500 text-lg py-20">
+                  No categories available at the moment.
+                </p>
               )}
             </div>
           )}
         </div>
       </section>
 
-      {/* Masonry Image Gallery */}
-      <section className="py-16 px-4 bg-muted">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold mb-10 text-center">
-            Explore Free Images
-          </h2>
-          <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
-            {galleryImages.map((src, i) => (
+      {/* Masonry Grid for Standard Category Images */}
+      <section className="py-16 px-6 md:px-12 lg:px-20 bg-gray-100">
+        <h2 className="text-3xl font-bold mb-10 text-center">Standard Category Highlights</h2>
+        <div className="max-w-7xl mx-auto columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6 space-y-6">
+          {standardCategories.filter(cat => cat.imageUrl).map((category) => (
+            <Link
+              to={`/photos?categoryId=${category.id}`}
+              key={`standard-${category.id}`}
+              className="block rounded-lg shadow-lg overflow-hidden cursor-pointer hover:shadow-2xl transition-shadow duration-300 break-inside-avoid"
+              aria-label={`View standard assets in category ${category.categoryName}`}
+            >
               <img
-                key={i}
-                src={`${src}?w=400&auto=format&fit=crop`}
-                alt={`Gallery ${i + 1}`}
-                className="w-full rounded-lg mb-4 break-inside-avoid shadow-md hover:scale-[1.02] transition-transform duration-300"
+                src={category.imageUrl!}
+                alt={`Category ${category.categoryName}`}
+                className="w-full rounded-t-lg object-cover aspect-[4/3] hover:scale-105 transition-transform duration-500"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472396961693-142e6e269027?w=600&h=450&fit=crop';
+                }}
               />
-            ))}
-          </div>
+              {(() => {
+                const assetCount = category._count?.assets ?? 0;
+                console.log(`Category "${category.categoryName}" has ${assetCount} assets`);
+                return (
+                  <div className="p-4 bg-white">
+                    <h3 className="text-lg font-semibold text-gray-900">{category.categoryName}</h3>
+                    <p className="text-sm text-gray-600">{assetCount.toLocaleString()} assets</p>
+                  </div>
+                );
+              })()}
+            </Link>
+          ))}
+          {standardCategories.length === 0 && (
+            <p className="text-center text-gray-500 text-lg py-20">No standard categories available.</p>
+          )}
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="py-16 px-4">
+      <section className="py-16 px-6 md:px-12 lg:px-20">
+        <h2 className="text-3xl font-bold mb-10 text-center">FAQ</h2>
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold mb-10 text-center">
-            FAQ
-          </h2>
           <Accordion type="single" collapsible className="space-y-4">
             {faqData.map((faq) => (
               <AccordionItem
                 key={faq.id}
                 value={`item-${faq.id}`}
-                className="bg-card border border-border rounded-lg px-6"
+                className="bg-white rounded-lg shadow border border-gray-200 px-6"
               >
-                <AccordionTrigger className="text-left font-semibold hover:text-primary">
+                <AccordionTrigger className="text-left font-semibold text-gray-900 hover:text-indigo-600">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground leading-relaxed">
+                <AccordionContent className="text-gray-600 leading-relaxed pt-2 pb-6">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>
@@ -221,6 +219,7 @@ const CategoryPage = () => {
           </Accordion>
         </div>
       </section>
+
       {/* Footer */}
       <Footer />
     </div>

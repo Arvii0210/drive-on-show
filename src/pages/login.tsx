@@ -4,7 +4,21 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/AuthContext";
-import { Loader2 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { 
+  Loader2, 
+  Mail, 
+  Lock, 
+  Eye, 
+  EyeOff, 
+  ArrowRight,
+  Shield,
+  Sparkles,
+  Users,
+  Download,
+  Heart
+} from "lucide-react";
 import { loginWithEmail, googleLogin } from "@/lib/authService";
 import { createSubscription, getUserSubscription } from "@/lib/subscriptionService";
 
@@ -12,172 +26,250 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-  if (!email || !password) {
-    return toast({
-      title: "Please enter email and password",
-      variant: "destructive",
-    });
-  }
-
-  try {
-    setLoading(true);
-    const res = await loginWithEmail({ email, password });
-
-    if (res.status === 200) {
-      const user = res.data?.data?.user;
-      const token = res.data?.data?.token;
-
-      // Save Auth
-      login(
-        {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          avatar: user.avatar || "",
-        },
-        token
-      );
-
-      localStorage.setItem("authToken", token);
-      localStorage.setItem("userId", user.id); // ✅ This was missing
-
-      // Subscription logic
-      try {
-        const sub = await getUserSubscription(user.id);
-        if (!sub) {
-          await createSubscription(user.id, "FREE");
-        }
-      } catch (err: any) {
-        if (err?.response?.status === 404) {
-          await createSubscription(user.id, "FREE");
-        }
-      }
-
-      toast({ title: "Logged in successfully!" });
-      navigate("/");
+    if (!email || !password) {
+      return toast({
+        title: "Please enter email and password",
+        variant: "destructive",
+      });
     }
-  } catch (err: any) {
-    toast({
-      title: err?.response?.data?.message || "Login failed",
-      variant: "destructive",
-    });
-  } finally {
-    setLoading(false);
-  }
-};
 
+    try {
+      setLoading(true);
+      const res = await loginWithEmail({ email, password });
 
+      if (res.status === 200) {
+        const user = res.data?.data?.user;
+        const token = res.data?.data?.token;
+        
+        // Save Auth
+        login(
+          {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            avatar: user.avatar || "",
+            createdAt: user.createdAt || "",
+          },
+          token
+        );
 
+        localStorage.setItem("authToken", token);
+        localStorage.setItem("userId", user.id);
+        console.log("User data being stored:", user);
+
+        // Subscription logic
+        try {
+          const sub = await getUserSubscription(user.id);
+          if (!sub) {
+            await createSubscription(user.id, "FREE");
+          }
+        } catch (err: any) {
+          if (err?.response?.status === 404) {
+            await createSubscription(user.id, "FREE");
+          }
+        }
+
+        toast({ title: "Logged in successfully!" });
+        navigate("/");
+      }
+    } catch (err: any) {
+      toast({
+        title: err?.response?.data?.message || "Login failed",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const features = [
+    { icon: Download, text: "Unlimited Downloads", color: "text-blue-600" },
+    { icon: Heart, text: "Premium Content", color: "text-red-600" },
+    { icon: Users, text: "Community Access", color: "text-green-600" },
+  ];
 
   return (
-    <div
-      className="min-h-screen bg-cover bg-center flex items-center justify-center px-4 relative"
-      style={{ backgroundImage: "url('/bg-login.jpg')" }}
-    >
-      {/* Background Blur Overlay */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-md z-0" />
+    <div className="min-h-screen flex">
+      {/* Left Side - Login Form */}
+      <div className="flex-1 flex items-center justify-center px-6 py-12 bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <div className="w-full max-w-md">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl mb-4">
+              <Sparkles className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
+            <p className="text-gray-600">Sign in to access your account</p>
+          </div>
 
-      {/* Login Card */}
-      <div className="w-full max-w-md bg-white/95 shadow-xl rounded-2xl p-8 z-10 relative">
-        <div className="flex justify-center mb-6">
-          <img src="/logo.png" alt="Site Logo" className="h-12" />
+          {/* Login Card */}
+          <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+            <CardHeader className="text-center pb-4">
+              <CardTitle className="text-xl">Sign In</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Email Input */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Email Address</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className="pl-10 h-12 border-2 focus:border-blue-500 transition-colors"
+                  />
+                </div>
+              </div>
+
+              {/* Password Input */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Password</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password"
+                    className="pl-10 pr-10 h-12 border-2 focus:border-blue-500 transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Forgot Password */}
+              <div className="text-right">
+                <Button variant="link" className="text-blue-600 hover:text-blue-700 p-0 h-auto">
+                  Forgot password?
+                </Button>
+              </div>
+
+              {/* Login Button */}
+              <Button
+                disabled={loading}
+                onClick={handleLogin}
+                className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105"
+              >
+                {loading ? (
+                  <div className="flex items-center">
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Signing in...
+                  </div>
+                ) : (
+                  <div className="flex items-center">
+                    Sign In
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </div>
+                )}
+              </Button>
+
+              {/* Divider */}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">or continue with</span>
+                </div>
+              </div>
+
+              {/* Google Login */}
+              <Button
+                onClick={googleLogin}
+                variant="outline"
+                className="w-full h-12 border-2 hover:bg-gray-50 transition-colors"
+              >
+                <img
+                  src="https://www.svgrepo.com/show/475656/google-color.svg"
+                  alt="Google"
+                  className="w-5 h-5 mr-3"
+                />
+                Continue with Google
+              </Button>
+
+              {/* Sign Up Link */}
+              <div className="text-center pt-4 border-t border-gray-100">
+                <p className="text-sm text-gray-600">
+                  Don't have an account?{" "}
+                  <Button
+                    variant="link"
+                    onClick={() => navigate("/register")}
+                    className="text-blue-600 hover:text-blue-700 p-0 h-auto font-semibold"
+                  >
+                    Sign up
+                  </Button>
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Security Notice */}
+          <div className="mt-6 text-center">
+            <div className="inline-flex items-center bg-green-50 text-green-700 px-4 py-2 rounded-full text-sm">
+              <Shield className="w-4 h-4 mr-2" />
+              Your data is secure and encrypted
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Side - Features */}
+      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-72 h-72 bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full translate-x-1/2 translate-y-1/2"></div>
         </div>
 
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-1">
-          Welcome Back
-        </h2>
-        <p className="text-center text-gray-500 text-sm mb-6">
-          Sign in to access free images and videos
-        </p>
+        <div className="relative z-10 flex items-center justify-center w-full">
+          <div className="text-center text-white max-w-md">
+            <h2 className="text-4xl font-bold mb-6">Unlock Your Creative Potential</h2>
+            <p className="text-xl mb-8 text-blue-100">
+              Access millions of high-quality assets and join our growing community
+            </p>
 
-        {/* Login Form */}
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              required
-              autoFocus
-              className="rounded-md"
-            />
+            {/* Features List */}
+            <div className="space-y-4">
+              {features.map((feature, index) => (
+                <div key={index} className="flex items-center justify-center space-x-3">
+                  <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                    <feature.icon className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="text-lg font-medium">{feature.text}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Stats */}
+            <div className="mt-12 grid grid-cols-3 gap-6">
+              <div className="text-center">
+                <div className="text-3xl font-bold">10M+</div>
+                <div className="text-sm text-blue-100">Assets</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold">50K+</div>
+                <div className="text-sm text-blue-100">Users</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold">99%</div>
+                <div className="text-sm text-blue-100">Satisfaction</div>
+              </div>
+            </div>
           </div>
-
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-              className="rounded-md"
-            />
-          </div>
-
-          <div className="text-right text-sm">
-            <a href="/forgot-password" className="text-blue-600 hover:underline">
-              Forgot password?
-            </a>
-          </div>
-
-          <Button
-            disabled={loading}
-            onClick={handleLogin}
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium py-2 rounded-md hover:opacity-90"
-          >
-            {loading ? (
-              <span className="flex items-center justify-center gap-2">
-                <Loader2 className="h-5 w-5 animate-spin" />
-                Logging in...
-              </span>
-            ) : (
-              "Login"
-            )}
-          </Button>
-
-          {/* Divider */}
-          <div className="flex items-center gap-4 my-3">
-            <hr className="flex-grow border-gray-300" />
-            <span className="text-gray-500 text-sm">or</span>
-            <hr className="flex-grow border-gray-300" />
-          </div>
-
-          {/* Google Login */}
-          <button
-            onClick={googleLogin}
-            className="w-full border border-gray-300 py-2 rounded-md flex items-center justify-center gap-2 hover:bg-gray-100 transition"
-          >
-            <img
-              src="https://www.svgrepo.com/show/475656/google-color.svg"
-              alt="Google Icon"
-              className="h-5 w-5"
-            />
-            <span className="text-sm text-gray-700 font-medium">
-              Continue with Google
-            </span>
-          </button>
-        </div>
-
-        {/* Footer */}
-        <div className="text-center mt-6 text-sm text-gray-600">
-          Don’t have an account?{" "}
-          <a href="/register" className="text-blue-600 hover:underline font-semibold">
-            Sign up
-          </a>
         </div>
       </div>
     </div>

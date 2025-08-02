@@ -16,6 +16,8 @@ const ProfileLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     navigate("/");
   };
 
+
+
   const links = [
     { name: "Account Info", path: "/profile/account", icon: <User size={18} /> },
     { name: "Downloads", path: "/profile/downloads", icon: <Download size={18} /> },
@@ -34,7 +36,7 @@ const ProfileLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           {/* User Info */}
           <div className="flex flex-col items-center gap-2 text-center">
             <img
-              src={user?.avatar || "/user-avatar.png"}
+              src={user?.avatar || "assets/images/user-avatar.jpg"}
               alt="avatar"
               className="w-16 h-16 rounded-full border"
             />
