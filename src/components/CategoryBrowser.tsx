@@ -96,7 +96,7 @@ const CategoryBrowser = () => {
           {Array.isArray(categories) && categories.length > 0 ? categories.map((category, index) => (
             <Link 
               key={category.id}
-              to={`/asset-list?category=${encodeURIComponent(category.categoryName)}`}
+              to={`/photos?categoryId=${category.id}`}
               className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-105 cursor-pointer bg-card border border-border"
               style={{ animationDelay: `${index * 100}ms` }}
             >

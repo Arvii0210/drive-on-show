@@ -165,10 +165,10 @@ const CategoryPage = () => {
         <h2 className="text-3xl font-bold mb-10 text-center">Standard Category Highlights</h2>
         <div className="max-w-7xl mx-auto columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6 space-y-6">
           {standardCategories.filter(cat => cat.imageUrl).map((category) => (
-            <Link
-              to={`/photos?categoryId=${category.id}`}
-              key={`standard-${category.id}`}
-              className="block rounded-lg shadow-lg overflow-hidden cursor-pointer hover:shadow-2xl transition-shadow duration-300 break-inside-avoid"
+              <Link
+                to={`/photos?categoryId=${category.id}`}
+                key={`standard-${category.id}`}
+                className="block rounded-lg shadow-lg overflow-hidden cursor-pointer hover:shadow-2xl transition-shadow duration-300 break-inside-avoid"
               aria-label={`View standard assets in category ${category.categoryName}`}
             >
               <img

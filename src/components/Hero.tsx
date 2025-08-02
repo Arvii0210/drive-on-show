@@ -1,8 +1,18 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Search, ArrowRight } from "lucide-react";
 
 const Hero = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/photos?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center px-4 bg-white overflow-hidden">
       {/* 🔥 Background Image */}
@@ -33,17 +43,22 @@ const Hero = () => {
         {/* 🔍 Search Bar */}
         <div className="mb-12">
           <div className="max-w-2xl mx-auto mb-8">
-            <div className="flex items-center bg-white border border-gray-300 rounded-full px-4 py-3 shadow-lg focus-within:ring-2 focus-within:ring-teal-500 transition-all duration-300">
+            <form onSubmit={handleSearch} className="flex items-center bg-white border border-gray-300 rounded-full px-4 py-3 shadow-lg focus-within:ring-2 focus-within:ring-teal-500 transition-all duration-300">
               <Search className="text-gray-500 w-5 h-5 mr-3" />
               <input
                 type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search for photos, vectors, illustrations..."
                 className="flex-1 bg-transparent outline-none text-base placeholder-gray-400"
               />
-              <button className="bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white px-4 py-2 rounded-full transition-all duration-300 shadow-sm text-sm font-semibold">
+              <button 
+                type="submit"
+                className="bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white px-4 py-2 rounded-full transition-all duration-300 shadow-sm text-sm font-semibold"
+              >
                 Search
               </button>
-            </div>
+            </form>
           </div>
 
           {/* CTA Button */}

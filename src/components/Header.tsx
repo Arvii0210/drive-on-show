@@ -29,6 +29,19 @@ const Header = () => {
 const [userSubscription, setUserSubscription] = useState<any>(null);
 const [isLoadingPlan, setLoading] = useState(true);
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchText.trim()) {
+      navigate(`/photos?q=${encodeURIComponent(searchText.trim())}`);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSearch(e);
+    }
+  };
+
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
@@ -110,24 +123,26 @@ const [isLoadingPlan, setLoading] = useState(true);
         </Link>
 
         {/* Search Bar */}
-        <div className="relative w-full md:flex-1 md:max-w-xl order-3 md:order-none">
+        <form onSubmit={handleSearch} className="relative w-full md:flex-1 md:max-w-xl order-3 md:order-none">
           <input
             type="text"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder="Search assets or start creating"
             className="w-full rounded-full border border-gray-300 bg-white px-12 py-2.5 text-sm font-medium shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
           />
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
           {searchText && (
             <button
+              type="button"
               onClick={() => setSearchText("")}
               className="absolute right-10 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition text-lg"
             >
               ×
             </button>
           )}
-        </div>
+        </form>
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-4">
