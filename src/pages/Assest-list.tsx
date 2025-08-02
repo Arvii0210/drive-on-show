@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Footer from "@/components/Footer";
-import { assetService, Asset, SearchParams } from "@/services/assetService";
+import { assetService, Asset, SearchParams, AssetResponse } from "@/services/assetService";
 import { categoryService, Category } from "@/services/categoryService";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Search, Filter, Download } from "lucide-react";
 import Header from "@/components/Header";
+import Pagination from "@/components/ui/pagination";
 
 // Hook to parse URL query parameters
 function useQuery() {
@@ -26,16 +27,31 @@ const AssetList = () => {
   const [loading, setLoading] = useState(true);
   const [searchLoading, setSearchLoading] = useState(false);
   const [categoryName, setCategoryName] = useState<string>("");
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 50,
+    total: 0,
+    totalPages: 0,
+    hasNext: false,
+    hasPrev: false,
+  });
+  const [availableFilters, setAvailableFilters] = useState({
+    categories: [],
+    fileTypes: [],
+    tags: [],
+  });
   
   // Initialize filters with URL params
   const [filters, setFilters] = useState<{
     q: string;
     categoryId: string;
     isPremium: string;
+    page: string;
   }>({
     q: query.get("q") || "",
     categoryId: query.get("categoryId") || "",
     isPremium: query.get("isPremium") || "",
+    page: query.get("page") || "1",
   });
 
   // Fetch categories on mount
@@ -43,6 +59,7 @@ const AssetList = () => {
     const fetchCategories = async () => {
       try {
         const cats = await categoryService.getCategories();
+        console.log('Fetched categories:', cats);
         setCategories(Array.isArray(cats) ? cats : []);
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -58,6 +75,7 @@ const AssetList = () => {
       q: query.get("q") || "",
       categoryId: query.get("categoryId") || "",
       isPremium: query.get("isPremium") || "",
+      page: query.get("page") || "1",
     };
     
     setFilters(newFilters);
@@ -82,8 +100,10 @@ const AssetList = () => {
     setLoading(true);
     try {
       const data = await assetService.getAssets();
+      console.log('Fetched assets:', data);
       setAssets(Array.isArray(data) ? data : []);
     } catch (error) {
+      console.error('Error fetching assets:', error);
       toast({
         title: "Error",
         description: "Failed to load assets. Please try again.",
@@ -132,10 +152,12 @@ const AssetList = () => {
 
     // If there's only category filter but no search query, fetch assets by category
     if (!filters.q.trim() && filters.categoryId) {
+      console.log('Fetching assets for category:', filters.categoryId);
       setSearchLoading(true);
       try {
-        const data = await assetService.getAssetsByCategory(filters.categoryId);
-        let filteredAssets = Array.isArray(data) ? data : [];
+        const response = await assetService.getAssetsByCategory(filters.categoryId);
+        console.log('Category response:', response);
+        let filteredAssets = response.assets;
         
         // Apply premium filter client-side if needed
         if (filters.isPremium === "true") {
@@ -144,30 +166,27 @@ const AssetList = () => {
           filteredAssets = filteredAssets.filter(asset => !asset.isPremium);
         }
         
+        console.log('Final filtered assets:', filteredAssets);
+        console.log('Setting assets state with:', filteredAssets.length, 'assets');
         setAssets(filteredAssets);
+        setPagination(response.pagination);
+        setAvailableFilters(response.filters.available);
       } catch (error) {
-        console.error("Category filtering failed, falling back to all assets:", error);
-        // Fallback: fetch all assets and filter by category client-side
-        try {
-          const allAssets = await assetService.getAssets();
-          let filteredAssets = allAssets.filter(asset => asset.category === filters.categoryId);
-          
-          // Apply premium filter client-side if needed
-          if (filters.isPremium === "true") {
-            filteredAssets = filteredAssets.filter(asset => asset.isPremium);
-          } else if (filters.isPremium === "false") {
-            filteredAssets = filteredAssets.filter(asset => !asset.isPremium);
-          }
-          
-          setAssets(filteredAssets);
-        } catch (fallbackError) {
-          toast({
-            title: "Error",
-            description: "Failed to load category assets. Please try again.",
-            variant: "destructive",
-          });
-          setAssets([]);
-        }
+        console.error("Category filtering failed:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load category assets. Please try again.",
+          variant: "destructive",
+        });
+        setAssets([]);
+        setPagination({
+          page: 1,
+          limit: 0,
+          total: 0,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false,
+        });
       } finally {
         setSearchLoading(false);
       }
@@ -187,14 +206,16 @@ const AssetList = () => {
             : undefined,
       };
       
-      // Only call search API if there's a search query
-      if (filters.q.trim()) {
-        const data = await assetService.searchAssets(searchParams);
-        setAssets(Array.isArray(data) ? data : []);
-      } else {
-        // This should not happen as we've handled all cases above
-        await fetchAssets();
-      }
+             // Only call search API if there's a search query
+       if (filters.q.trim()) {
+         const response = await assetService.searchAssets(searchParams);
+         setAssets(response.assets);
+         setPagination(response.pagination);
+         setAvailableFilters(response.filters.available);
+       } else {
+         // This should not happen as we've handled all cases above
+         await fetchAssets();
+       }
     } catch (error) {
       toast({
         title: "Error",
@@ -213,6 +234,7 @@ const AssetList = () => {
     if (newFilters.q) params.set("q", newFilters.q);
     if (newFilters.categoryId) params.set("categoryId", newFilters.categoryId);
     if (newFilters.isPremium) params.set("isPremium", newFilters.isPremium);
+    if (newFilters.page && newFilters.page !== "1") params.set("page", newFilters.page);
     
     const newURL = params.toString() ? `${location.pathname}?${params.toString()}` : location.pathname;
     navigate(newURL, { replace: true });
@@ -260,7 +282,13 @@ const AssetList = () => {
   };
 
   const clearFilters = () => {
-    const newFilters = { q: "", categoryId: "", isPremium: "" };
+    const newFilters = { q: "", categoryId: "", isPremium: "", page: "1" };
+    setFilters(newFilters);
+    updateURL(newFilters);
+  };
+
+  const handlePageChange = (page: number) => {
+    const newFilters = { ...filters, page: page.toString() };
     setFilters(newFilters);
     updateURL(newFilters);
   };
@@ -280,6 +308,10 @@ const AssetList = () => {
   }
 
   const safeAssets = Array.isArray(assets) ? assets : [];
+  console.log('Current assets state:', assets);
+  console.log('Safe assets for rendering:', safeAssets);
+  console.log('Safe assets length:', safeAssets.length);
+  console.log('Safe assets type:', typeof safeAssets);
 
   return (
     <div className="min-h-screen bg-background">
@@ -378,29 +410,33 @@ const AssetList = () => {
         </p>
       </div>
 
-      {/* Masonry Grid Section */}
-      <div className="max-w-7xl mx-auto px-6 pb-10">
-        {safeAssets.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">
-              No assets found. Try adjusting your search criteria.
-            </p>
-          </div>
-        ) : (
-          <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
-            {safeAssets.map((item, idx) => (
+             {/* Masonry Grid Section */}
+       <div className="max-w-7xl mx-auto px-6 pb-10">
+         {safeAssets.length === 0 ? (
+           <div className="text-center py-12">
+             <p className="text-muted-foreground">
+               No assets found. Try adjusting your search criteria.
+             </p>
+           </div>
+         ) : (
+                     <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+             {safeAssets.map((item, idx) => (
               <div
                 key={item.id}
                 className="break-inside-avoid rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition duration-300 bg-card cursor-pointer group"
                 onClick={() => handleImageClick(item)}
               >
-                <div className="relative">
-                  <img
-                    src={item.src}
-                    alt={item.title}
-                    className="w-full object-cover rounded-2xl hover:scale-105 transition duration-300"
-                    style={{ height: `${200 + (idx % 3) * 50}px` }}
-                  />
+                                 <div className="relative">
+                   <img
+                     src={item.src || item.thumbnail || '/placeholder.svg'}
+                     alt={item.title}
+                     className="w-full object-cover rounded-2xl hover:scale-105 transition duration-300"
+                     style={{ height: `${200 + (idx % 3) * 50}px` }}
+                     onError={(e) => {
+                       const target = e.target as HTMLImageElement;
+                       target.src = '/placeholder.svg';
+                     }}
+                   />
 
                   {/* Premium Badge */}
                   {item.isPremium && (
@@ -434,20 +470,32 @@ const AssetList = () => {
                   )}
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>By {item.author?.name ?? "Unknown"}</span>
-                    <Badge variant="secondary" className="text-xs">
-                      {item.category}
-                    </Badge>
+                                         <Badge variant="secondary" className="text-xs">
+                       {typeof item.category === 'string' ? item.category : item.category?.name || 'Unknown'}
+                     </Badge>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-        )}
-      </div>
-      <Footer />
-    </div>
-  );
-};
+                 )}
+       </div>
+       
+       {/* Pagination */}
+       <Pagination
+         currentPage={pagination.page}
+         totalPages={pagination.totalPages}
+         total={pagination.total}
+         limit={pagination.limit}
+         onPageChange={handlePageChange}
+         hasNext={pagination.hasNext}
+         hasPrev={pagination.hasPrev}
+       />
+       
+       <Footer />
+     </div>
+   );
+ };
 
 export default AssetList;
 

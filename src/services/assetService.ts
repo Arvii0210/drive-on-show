@@ -5,17 +5,39 @@ const API_BASE_URL = 'http://localhost:3000/api/asset'; // Make sure this matche
 // Asset interface based on the expected API response
 export interface Asset {
   id: string;
-  src: string;
+  src?: string;
   title: string;
   description?: string;
-  author: {
+  author?: {
+    id: string;
     name: string;
     avatar?: string;
   };
-  isPremium: boolean;
-  category: string;
+  isPremium?: boolean;
+  isFree?: boolean;
+  category?: {
+    id: string;
+    name: string;
+    slug?: string;
+  } | string; // Handle both object and string formats
+  fileType?: string;
+  fileSize?: number;
+  dimensions?: {
+    width: number;
+    height: number;
+  };
+  tags?: string[];
+  downloadCount?: number;
+  viewCount?: number;
+  thumbnail?: string;
+  previewUrl?: string;
   createdAt?: string;
   updatedAt?: string;
+  metadata?: {
+    colorPalette?: string[];
+    dominantColors?: string[];
+    keywords?: string[];
+  };
 }
 
 export interface AssetStats {
@@ -35,10 +57,30 @@ export interface SearchParams {
   assetType?: 'STANDARD' | 'PREMIUM';
   fileType?: string;
   tags?: string;
-  sortBy?: string;
+  sortBy?: 'createdAt' | 'title' | 'downloadCount' | 'category' | 'isPremium';
   sortOrder?: 'asc' | 'desc';
   page?: number;
   limit?: number;
+}
+
+export interface AssetResponse {
+  assets: Asset[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+  filters: {
+    applied: SearchParams;
+    available: {
+      categories: Array<{ id: string; name: string; count: number }>;
+      fileTypes: Array<{ type: string; count: number }>;
+      tags: Array<{ tag: string; count: number }>;
+    };
+  };
 }
 
 // Create axios instance with auth interceptor
@@ -67,9 +109,21 @@ assetApi.interceptors.response.use(
 
 // Helper function to extract assets from different response structures
 const extractAssets = (response: any): Asset[] => {
+  console.log('Extracting assets from response:', response);
+  
   // Handle different possible response structures
   if (Array.isArray(response)) {
     return response;
+  }
+  
+  // Handle the actual API response structure: { success, status, message: { data: [...] } }
+  if (response && response.message && Array.isArray(response.message.data)) {
+    console.log('Found assets in response.message.data:', response.message.data);
+    // Log the first asset to see its structure
+    if (response.message.data.length > 0) {
+      console.log('Sample asset structure:', response.message.data[0]);
+    }
+    return response.message.data;
   }
   
   if (response && Array.isArray(response.data)) {
@@ -94,6 +148,7 @@ export const assetService = {
   async getAssets(): Promise<Asset[]> {
     try {
       const response = await assetApi.get('/');
+      console.log('Get assets response:', response.data);
       return extractAssets(response.data);
     } catch (error) {
       console.error('Failed to fetch assets:', error);
@@ -112,37 +167,174 @@ export const assetService = {
     }
   },
 
-  // Search assets
-  async searchAssets(params: SearchParams): Promise<Asset[]> {
+  // Search assets with advanced filtering and pagination
+  async searchAssets(params: SearchParams): Promise<AssetResponse> {
     try {
       const response = await assetApi.get('/search', { params });
-      return extractAssets(response.data);
+      console.log('Search response:', response.data);
+      
+      // Handle the actual API response structure
+      if (response.data && response.data.message && Array.isArray(response.data.message.data)) {
+        const assets = response.data.message.data;
+        const meta = response.data.message.meta || {};
+        
+        return {
+          assets: assets,
+          pagination: {
+            page: meta.page || 1,
+            limit: meta.limit || assets.length,
+            total: meta.total || assets.length,
+            totalPages: meta.totalPages || 1,
+            hasNext: false,
+            hasPrev: false,
+          },
+          filters: {
+            applied: params,
+            available: {
+              categories: [],
+              fileTypes: [],
+              tags: [],
+            },
+          },
+        };
+      }
+      
+      // Handle both old format (array) and new format (structured response)
+      if (Array.isArray(response.data)) {
+        return {
+          assets: response.data,
+          pagination: {
+            page: 1,
+            limit: response.data.length,
+            total: response.data.length,
+            totalPages: 1,
+            hasNext: false,
+            hasPrev: false,
+          },
+          filters: {
+            applied: params,
+            available: {
+              categories: [],
+              fileTypes: [],
+              tags: [],
+            },
+          },
+        };
+      }
+      
+      return response.data;
     } catch (error) {
       console.error('Failed to search assets:', error);
-      return [];
+      return {
+        assets: [],
+        pagination: {
+          page: 1,
+          limit: 0,
+          total: 0,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false,
+        },
+        filters: {
+          applied: params,
+          available: {
+            categories: [],
+            fileTypes: [],
+            tags: [],
+          },
+        },
+      };
     }
   },
 
-  // Get assets by category
-  async getAssetsByCategory(categoryId: string): Promise<Asset[]> {
+  // Get assets by category with advanced filtering
+  async getAssetsByCategory(categoryId: string, params?: Partial<SearchParams>): Promise<AssetResponse> {
     try {
-      // Try using search endpoint with just category parameter
-      const response = await assetApi.get('/search', { 
-        params: { 
-          category: categoryId 
-        } 
+      // Since the search API requires a query, we'll fetch all assets and filter by category
+      const allAssets = await this.getAssets();
+      console.log('All assets:', allAssets);
+      console.log('Filtering by categoryId:', categoryId);
+      
+      const filteredAssets = allAssets.filter(asset => {
+        // Check for different possible category field names
+        const category = asset.category || (asset as any).categoryId || (asset as any).categoryName;
+        console.log('Asset category:', asset.title, category);
+        
+        if (!category) {
+          console.log('No category for asset:', asset.title);
+          return false;
+        }
+        
+        if (typeof category === "string") {
+          const matches = category === categoryId;
+          console.log('String category match:', category, '===', categoryId, '=', matches);
+          return matches;
+        }
+        
+        // Handle different possible category object structures
+        const assetCategoryId = category.id || category.categoryId;
+        const assetCategoryName = category.name || category.categoryName;
+        
+        const matches = assetCategoryId === categoryId || assetCategoryName === categoryId;
+        console.log('Object category match:', assetCategoryId, '===', categoryId, 'OR', assetCategoryName, '===', categoryId, '=', matches);
+        return matches;
       });
-      return extractAssets(response.data);
+      
+      console.log('Filtered assets before return:', filteredAssets);
+      
+      // If no assets found, let's try a broader search
+      if (filteredAssets.length === 0) {
+        console.log('No assets found with exact category match, trying broader search...');
+        const broaderFiltered = allAssets.filter(asset => {
+          // Log all possible category-related fields
+          console.log('Asset full structure:', asset);
+          return false; // Don't return any for now, just log
+        });
+        console.log('Broader search results:', broaderFiltered);
+      }
+      
+      console.log('Filtered assets:', filteredAssets);
+      
+      return {
+        assets: filteredAssets,
+        pagination: {
+          page: 1,
+          limit: filteredAssets.length,
+          total: filteredAssets.length,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        },
+        filters: {
+          applied: { categoryId, ...params },
+          available: {
+            categories: [],
+            fileTypes: [],
+            tags: [],
+          },
+        },
+      };
     } catch (error) {
       console.error(`Failed to fetch assets for category ${categoryId}:`, error);
-      // Fallback: fetch all assets and filter client-side
-      try {
-        const allAssets = await this.getAssets();
-        return allAssets.filter(asset => asset.category === categoryId);
-      } catch (fallbackError) {
-        console.error('Fallback also failed:', fallbackError);
-        return [];
-      }
+      return {
+        assets: [],
+        pagination: {
+          page: 1,
+          limit: 0,
+          total: 0,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false,
+        },
+        filters: {
+          applied: { categoryId, ...params },
+          available: {
+            categories: [],
+            fileTypes: [],
+            tags: [],
+          },
+        },
+      };
     }
   },
 
@@ -165,6 +357,79 @@ export const assetService = {
     } catch (error) {
       console.error(`Failed to download asset ${id}:`, error);
       return null;
+    }
+  },
+
+  // Get asset analytics
+  async getAssetAnalytics(id: string): Promise<{
+    downloadCount: number;
+    viewCount: number;
+    rating?: number;
+    reviews?: number;
+  } | null> {
+    try {
+      const response = await assetApi.get(`/${id}/analytics`);
+      return response.data;
+    } catch (error) {
+      console.error(`Failed to fetch analytics for asset ${id}:`, error);
+      return null;
+    }
+  },
+
+  // Get related assets
+  async getRelatedAssets(id: string, limit: number = 10): Promise<Asset[]> {
+    try {
+      const response = await assetApi.get(`/${id}/related`, { params: { limit } });
+      return extractAssets(response.data);
+    } catch (error) {
+      console.error(`Failed to fetch related assets for ${id}:`, error);
+      return [];
+    }
+  },
+
+  // Get trending assets
+  async getTrendingAssets(limit: number = 20): Promise<Asset[]> {
+    try {
+      const response = await assetApi.get('/trending', { params: { limit } });
+      return extractAssets(response.data);
+    } catch (error) {
+      console.error('Failed to fetch trending assets:', error);
+      return [];
+    }
+  },
+
+  // Get assets by tags
+  async getAssetsByTags(tags: string[], params?: Partial<SearchParams>): Promise<AssetResponse> {
+    try {
+      const searchParams: SearchParams = {
+        tags: tags.join(','),
+        page: 1,
+        limit: 50,
+        ...params,
+      };
+      
+      return await this.searchAssets(searchParams);
+    } catch (error) {
+      console.error('Failed to fetch assets by tags:', error);
+      return {
+        assets: [],
+        pagination: {
+          page: 1,
+          limit: 0,
+          total: 0,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false,
+        },
+        filters: {
+          applied: { tags: tags.join(','), ...params },
+          available: {
+            categories: [],
+            fileTypes: [],
+            tags: [],
+          },
+        },
+      };
     }
   },
 };
