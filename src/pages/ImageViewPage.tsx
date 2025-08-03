@@ -1,83 +1,65 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Download, ArrowLeft, Share2, Heart, Eye, Calendar, User, Maximize2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useDownload } from '@/hooks/useDownload';
+import { useSubscription } from '@/hooks/useSubscription';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { assetService, Asset } from '@/services/assetService';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-
-// Sample image data - replace with actual data fetching
-const sampleImages = [
-  {
-    id: '1',
-    src: '/placeholder.svg',
-    title: 'Beautiful Sunset Landscape',
-    description: 'A stunning view of the sunset over rolling hills with vibrant colors painting the sky.',
-    author: { name: 'John Photographer', avatar: '/placeholder.svg' },
-    isPremium: false,
-    category: 'landscape',
-    size: '1920x1080',
-    views: 1250,
-    downloads: 89,
-    uploadDate: '2024-01-15'
-  },
-  {
-    id: '2',
-    src: '/placeholder.svg',
-    title: 'Modern Architecture',
-    description: 'Clean lines and geometric patterns in contemporary building design.',
-    author: { name: 'Jane Designer', avatar: '/placeholder.svg' },
-    isPremium: true,
-    category: 'architecture',
-    size: '2560x1440',
-    views: 890,
-    downloads: 45,
-    uploadDate: '2024-01-10'
-  },
-  // Add more sample images for related section
-  ...Array.from({ length: 8 }, (_, i) => ({
-    id: `related-${i + 1}`,
-    src: '/placeholder.svg',
-    title: `Related Image ${i + 1}`,
-    description: 'Related image description',
-    author: { name: 'Artist Name', avatar: '/placeholder.svg' },
-    isPremium: i % 3 === 0,
-    category: 'landscape',
-    size: '1920x1080',
-    views: Math.floor(Math.random() * 1000) + 100,
-    downloads: Math.floor(Math.random() * 100) + 10,
-    uploadDate: '2024-01-01'
-  }))
-];
 
 const ImageViewPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { refreshSubscription } = useSubscription();
+  const { downloadAsset, downloading } = useDownload(refreshSubscription);
+  
+  const [currentImage, setCurrentImage] = useState<Asset | null>(null);
+  const [relatedImages, setRelatedImages] = useState<Asset[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [showZoom, setShowZoom] = useState(false);
 
-  // Find the current image
-  const currentImage = sampleImages.find(img => img.id === id) || sampleImages[0];
-  
-  // Get related images (excluding current)
-  const relatedImages = sampleImages
-    .filter(img => img.id !== currentImage.id && img.category === currentImage.category)
-    .slice(0, 8);
+  // Fetch asset data
+  useEffect(() => {
+    const fetchAssetData = async () => {
+      if (!id) return;
+      
+      setLoading(true);
+      try {
+        // Fetch current asset
+        const asset = await assetService.getAssetById(id);
+        if (asset) {
+          setCurrentImage(asset);
+          
+          // Fetch related assets
+          const related = await assetService.getRelatedAssets(id, 8);
+          setRelatedImages(related);
+        }
+      } catch (error) {
+        console.error('Failed to fetch asset data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleDownload = () => {
+    fetchAssetData();
+  }, [id]);
+
+  const handleDownload = async () => {
     if (!user) {
       setShowLoginModal(true);
       return;
     }
     
-    if (currentImage.isPremium) {
-      alert('Premium download requires subscription');
-    } else {
-      alert('Starting download...');
-    }
+    if (!currentImage) return;
+    
+    const assetType = currentImage.isPremium || currentImage.assetCategory === 'PREMIUM' ? 'premium' : 'standard';
+    await downloadAsset(currentImage.id, assetType);
   };
 
   const handleShare = () => {
@@ -88,6 +70,44 @@ const ImageViewPage = () => {
   const handleImageClick = (imageId: string) => {
     navigate(`/image/${imageId}`);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading image...</p>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!currentImage) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center py-12">
+            <h1 className="text-2xl font-bold mb-4">Image Not Found</h1>
+            <p className="text-muted-foreground mb-6">The image you're looking for doesn't exist.</p>
+            <Button onClick={() => navigate('/photos')}>
+              Browse All Images
+            </Button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  const imageSrc = currentImage.thumbnail || currentImage.previewUrl || currentImage.src || '/placeholder.svg';
+  const isPremium = currentImage.isPremium || currentImage.assetCategory === 'PREMIUM';
 
   return (
     <div className="min-h-screen bg-background">
@@ -129,17 +149,18 @@ const ImageViewPage = () => {
             </Button>
             <Button
               onClick={handleDownload}
+              disabled={downloading}
               className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
               <Download className="w-4 h-4 mr-2" />
-              {currentImage.isPremium ? 'Premium' : 'Free'} Download
+              {downloading ? 'Downloading...' : `${isPremium ? 'Premium' : 'Free'} Download`}
             </Button>
           </div>
 
           {/* Main Image */}
           <div className="flex justify-center">
             <img
-              src={currentImage.src}
+              src={imageSrc}
               alt={currentImage.title}
               className="max-w-full max-h-[70vh] object-contain rounded-xl shadow-lg cursor-pointer"
               onClick={() => setShowZoom(true)}
@@ -153,30 +174,36 @@ const ImageViewPage = () => {
           <div className="lg:col-span-2">
             <h1 className="text-3xl font-bold mb-4">{currentImage.title}</h1>
             <p className="text-muted-foreground mb-6 leading-relaxed">
-              {currentImage.description}
+              {currentImage.description || 'No description available.'}
             </p>
             
             {/* Stats */}
             <div className="flex flex-wrap gap-6 text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
                 <Eye className="w-4 h-4" />
-                {currentImage.views.toLocaleString()} views
+                {(currentImage.viewCount || 0).toLocaleString()} views
               </div>
               <div className="flex items-center gap-1">
                 <Download className="w-4 h-4" />
-                {currentImage.downloads} downloads
+                {(currentImage.downloadCount || 0)} downloads
               </div>
               <div className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
-                {new Date(currentImage.uploadDate).toLocaleDateString()}
+                {currentImage.createdAt ? new Date(currentImage.createdAt).toLocaleDateString() : 'Unknown date'}
               </div>
               <div className="text-sm">
-                Size: {currentImage.size}
+                {currentImage.dimensions ? 
+                  `Size: ${currentImage.dimensions.width}x${currentImage.dimensions.height}` : 
+                  'Size: Unknown'
+                }
               </div>
+              {currentImage.fileType && (
+                <div className="text-sm">
+                  Type: {currentImage.fileType.toUpperCase()}
+                </div>
+              )}
             </div>
           </div>
-
-          
         </div>
 
         {/* Related Images */}
@@ -184,33 +211,38 @@ const ImageViewPage = () => {
           <section>
             <h2 className="text-2xl font-bold mb-6">Related Images</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {relatedImages.map((image) => (
-                <div
-                  key={image.id}
-                  onClick={() => handleImageClick(image.id)}
-                  className="group cursor-pointer"
-                >
-                  <div className="aspect-square bg-zinc-200 dark:bg-zinc-700 rounded-lg overflow-hidden relative">
-                    <img
-                      src={image.src}
-                      alt={image.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    {image.isPremium && (
-                      <div className="absolute top-2 right-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-2 py-1 rounded text-xs font-semibold">
-                        Pro
+              {relatedImages.map((image) => {
+                const relatedImageSrc = image.thumbnail || image.previewUrl || image.src || '/placeholder.svg';
+                const isRelatedPremium = image.isPremium || image.assetCategory === 'PREMIUM';
+                
+                return (
+                  <div
+                    key={image.id}
+                    onClick={() => handleImageClick(image.id)}
+                    className="group cursor-pointer"
+                  >
+                    <div className="aspect-square bg-zinc-200 dark:bg-zinc-700 rounded-lg overflow-hidden relative">
+                      <img
+                        src={relatedImageSrc}
+                        alt={image.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      {isRelatedPremium && (
+                        <div className="absolute top-2 right-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-2 py-1 rounded text-xs font-semibold">
+                          Pro
+                        </div>
+                      )}
+                      {/* Hover Overlay */}
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <Download className="w-6 h-6 text-white" />
                       </div>
-                    )}
-                    {/* Hover Overlay */}
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                      <Download className="w-6 h-6 text-white" />
                     </div>
+                    <p className="text-sm font-medium mt-2 truncate">
+                      {image.title}
+                    </p>
                   </div>
-                  <p className="text-sm font-medium mt-2 truncate">
-                    {image.title}
-                  </p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
         )}
@@ -242,7 +274,7 @@ const ImageViewPage = () => {
       <Dialog open={showZoom} onOpenChange={setShowZoom}>
         <DialogContent className="max-w-[95vw] max-h-[95vh] p-2">
           <img
-            src={currentImage.src}
+            src={imageSrc}
             alt={currentImage.title}
             className="w-full h-full object-contain"
           />
