@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useDownload } from '@/hooks/useDownload';
 import { useSubscription } from '@/hooks/useSubscription';
 import { Button } from '@/components/ui/button';
+import DownloadButton from '@/components/DownloadButton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { assetService, Asset } from '@/services/assetService';
 import Header from '@/components/Header';
@@ -155,14 +156,11 @@ const ImageViewPage = () => {
             >
               <Share2 className="w-4 h-4" />
             </Button>
-            <Button
-              onClick={handleDownload}
-              disabled={downloading}
+            <DownloadButton
+              assetId={currentImage.id}
+              isPremium={isPremium}
               className="bg-primary text-primary-foreground hover:bg-primary/90"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              {downloading ? 'Downloading...' : `${isPremium ? 'Premium' : 'Free'} Download`}
-            </Button>
+            />
           </div>
 
           {/* Main Image */}

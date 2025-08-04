@@ -32,6 +32,7 @@ import Header from "@/components/Header";
 import Pagination from "@/components/ui/pagination";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDownload } from "@/hooks/useDownload";
+import DownloadButton from "@/components/DownloadButton";
 
 // Hook to parse URL query parameters
 function useQuery() {
@@ -704,14 +705,14 @@ const AssetList = () => {
                       <div className={`absolute inset-0 z-20 flex items-center justify-center space-x-3 transition-all duration-300 ${
                         hoveredAsset === item.id ? 'opacity-100' : 'opacity-0'
                       }`}>
-                        <Button
-                          size="sm"
-                          onClick={(e) => handleDownload(item.id, e)}
-                          className="bg-white/95 hover:bg-white text-slate-900 shadow-lg backdrop-blur-sm border-0 transition-all duration-200 hover:scale-105"
-                        >
-                          <Download className="h-4 w-4 mr-2" />
-                          Download
-                        </Button>
+                        <div onClick={(e) => e.stopPropagation()}>
+                          <DownloadButton
+                            assetId={item.id}
+                            isPremium={item.isPremium || item.assetCategory === 'PREMIUM'}
+                            variant="secondary"
+                            className="bg-white/95 hover:bg-white text-slate-900 shadow-lg backdrop-blur-sm border-0 transition-all duration-200 hover:scale-105"
+                          />
+                        </div>
                         
                         <Button
                           size="sm"
