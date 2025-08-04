@@ -33,12 +33,16 @@ const ImageViewPage = () => {
       try {
         // Fetch current asset
         const asset = await assetService.getAssetById(id);
+        console.log('Fetched asset:', asset);
         if (asset) {
           setCurrentImage(asset);
           
-          // Fetch related assets
-          const related = await assetService.getRelatedAssets(id, 8);
-          setRelatedImages(related);
+          // Fetch related assets (temporarily disabled due to missing API endpoint)
+          // const related = await assetService.getRelatedAssets(id, 8);
+          // setRelatedImages(related);
+          
+          // For now, set empty array to avoid errors
+          setRelatedImages([]);
         }
       } catch (error) {
         console.error('Failed to fetch asset data:', error);
@@ -108,6 +112,10 @@ const ImageViewPage = () => {
 
   const imageSrc = currentImage.thumbnail || currentImage.previewUrl || currentImage.src || '/placeholder.svg';
   const isPremium = currentImage.isPremium || currentImage.assetCategory === 'PREMIUM';
+  
+  console.log('Current image:', currentImage);
+  console.log('Image source:', imageSrc);
+  console.log('Is premium:', isPremium);
 
   return (
     <div className="min-h-screen bg-background">

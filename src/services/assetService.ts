@@ -162,7 +162,52 @@ export const assetService = {
   async getAssetById(id: string): Promise<Asset | null> {
     try {
       const response = await assetApi.get(`/${id}`);
-      return response.data;
+      console.log('Asset response:', response.data);
+      
+      let assetData = null;
+      
+      // Handle the API response structure where data is nested in message
+      if (response.data && response.data.message) {
+        console.log('Extracted asset from message:', response.data.message);
+        assetData = response.data.message;
+      } else if (response.data && response.data.id) {
+        console.log('Extracted asset from direct data:', response.data);
+        assetData = response.data;
+      } else {
+        console.log('Using fallback data:', response.data);
+        assetData = response.data;
+      }
+      
+      // Map the API response to the expected Asset interface
+      if (assetData) {
+        const mappedAsset: Asset = {
+          id: assetData.id,
+          title: assetData.title,
+          description: assetData.description,
+          src: assetData.fileUrl || assetData.src || assetData.imageUrl,
+          thumbnail: assetData.thumbnailUrl || assetData.thumbnail || assetData.previewUrl,
+          previewUrl: assetData.previewUrl || assetData.thumbnailUrl || assetData.fileUrl,
+          isPremium: assetData.isPremium || assetData.premium || false,
+          isFree: assetData.isFree || !assetData.isPremium || false,
+          assetCategory: assetData.assetCategory || (assetData.isPremium ? 'PREMIUM' : 'STANDARD'),
+          categoryId: assetData.categoryId,
+          category: assetData.category,
+          author: assetData.author,
+          fileType: assetData.fileType,
+          fileSize: assetData.fileSize,
+          dimensions: assetData.dimensions,
+          tags: assetData.tags || [],
+          downloadCount: assetData.downloadCount || 0,
+          viewCount: assetData.viewCount || 0,
+          createdAt: assetData.createdAt,
+          updatedAt: assetData.updatedAt
+        };
+        
+        console.log('Mapped asset:', mappedAsset);
+        return mappedAsset;
+      }
+      
+      return null;
     } catch (error) {
       console.error(`Failed to fetch asset ${id}:`, error);
       return null;
@@ -403,6 +448,21 @@ export const assetService = {
       return extractAssets(response.data);
     } catch (error) {
       console.error(`Failed to fetch related assets for ${id}:`, error);
+      
+      // Fallback: Get assets from the same category instead
+      try {
+        const currentAsset = await this.getAssetById(id);
+        if (currentAsset && currentAsset.categoryId) {
+          const categoryAssets = await this.getAssetsByCategory(currentAsset.categoryId, { limit });
+          // Filter out the current asset and return related ones
+          return categoryAssets.assets
+            .filter(asset => asset.id !== id)
+            .slice(0, limit);
+        }
+      } catch (fallbackError) {
+        console.error('Fallback failed:', fallbackError);
+      }
+      
       return [];
     }
   },
