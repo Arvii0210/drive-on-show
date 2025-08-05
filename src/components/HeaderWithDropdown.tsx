@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ChevronDown, LogOut, Search, Camera, Filter, ArrowUpDown, Check } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const filters = ["License", "AI-generated", "Orientation", "Color", "People", "File type"];
 const sortOptions = ["Most Relevant", "Most Recent"];
@@ -17,6 +17,7 @@ const HeaderWithDropdown = () => {
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   const [selectedSort, setSelectedSort] = useState("Most Relevant");
   const [activeCategory, setActiveCategory] = useState("All Images");
+  const navigate = useNavigate();
 
   const profileRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -35,6 +36,19 @@ const HeaderWithDropdown = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const handleSearchSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (searchText.trim()) {
+      navigate(`/photos?q=${encodeURIComponent(searchText.trim())}`);
+    }
+  };
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearchSubmit();
+    }
+  };
+
   return (
     <header className="sticky top-0 z-50 bg-white border-b shadow-sm">
       {/* Top Header */}
@@ -45,17 +59,24 @@ const HeaderWithDropdown = () => {
 </Link>
 
         {/* Search Input */}
-        <div className="relative w-full max-w-3xl flex-grow">
+        <form onSubmit={handleSearchSubmit} className="relative w-full max-w-3xl flex-grow">
           <input
             type="text"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
-            placeholder="Search assets or start creating"
+            onKeyDown={handleSearchKeyDown}
+            placeholder="Search assets, tags, or start creating..."
             className="w-full rounded-full border border-gray-300 bg-white px-16 py-3 text-base font-medium shadow-md placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
           />
-          <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
+          <button
+            type="submit"
+            className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-blue-500 transition-colors cursor-pointer"
+          >
+            <Search className="w-5 h-5" />
+          </button>
           {searchText && (
             <button
+              type="button"
               onClick={() => setSearchText("")}
               className="absolute right-12 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition text-lg"
             >
@@ -63,7 +84,7 @@ const HeaderWithDropdown = () => {
             </button>
           )}
           <Camera className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-700 w-5 h-5" />
-        </div>
+        </form>
 
         {/* Pricing & Profile */}
         <div className="flex items-center gap-6 shrink-0">

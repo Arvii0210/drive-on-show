@@ -3,8 +3,27 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Search, SlidersHorizontal } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const SearchSection = () => {
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      navigate(`/photos?q=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      navigate('/photos');
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   return (
     <section className="py-16 bg-background">
       <div className="container mx-auto px-4">
@@ -117,14 +136,27 @@ const SearchSection = () => {
                 </div>
               </div>
 
+              <div className="mb-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Search Assets</label>
+                  <Input 
+                    placeholder="Search for images, vectors, icons, or enter tags like 'forest', 'nature'..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    className="text-base"
+                  />
+                </div>
+              </div>
+
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button variant="hero" size="lg" className="flex-1">
+                <Button onClick={handleSearch} variant="hero" size="lg" className="flex-1">
                   <Search className="h-5 w-5 mr-2" />
-                  Search Vehicles
+                  Search Assets
                 </Button>
-                <Button variant="outline" size="lg">
+                <Button variant="outline" size="lg" onClick={() => navigate('/photos')}>
                   <SlidersHorizontal className="h-5 w-5 mr-2" />
-                  Advanced Filters
+                  Browse All
                 </Button>
               </div>
             </CardContent>

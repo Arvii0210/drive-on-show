@@ -216,13 +216,26 @@ export const assetService = {
   // Search assets with advanced filtering and pagination
   async searchAssets(params: SearchParams): Promise<AssetResponse> {
     try {
-      const response = await assetApi.get('/search', { params });
+      // Enhanced search parameters to handle tags and related content
+      const searchParams = { ...params };
+      
+      // If the search query contains keywords that could be tags, enhance the search
+      if (params.q) {
+        searchParams.tags = params.q; // Pass the query as tags parameter too
+      }
+      
+      const response = await assetApi.get('/search', { params: searchParams });
       console.log('Search response:', response.data);
       
       // Handle the actual API response structure
       if (response.data && response.data.message && Array.isArray(response.data.message.data)) {
         const assets = response.data.message.data;
         const meta = response.data.message.meta || {};
+        
+        // If API search doesn't return good results, try local filtering on all assets
+        if (assets.length === 0 && params.q) {
+          return this.fallbackSearch(params);
+        }
         
         return {
           assets: assets,
@@ -247,6 +260,11 @@ export const assetService = {
       
       // Handle both old format (array) and new format (structured response)
       if (Array.isArray(response.data)) {
+        // If API search doesn't return good results, try local filtering
+        if (response.data.length === 0 && params.q) {
+          return this.fallbackSearch(params);
+        }
+        
         return {
           assets: response.data,
           pagination: {
@@ -271,6 +289,114 @@ export const assetService = {
       return response.data;
     } catch (error) {
       console.error('Failed to search assets:', error);
+      
+      // On API error, try fallback search if query exists
+      if (params.q) {
+        console.log('Attempting fallback search...');
+        return this.fallbackSearch(params);
+      }
+      
+      return {
+        assets: [],
+        pagination: {
+          page: 1,
+          limit: 0,
+          total: 0,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false,
+        },
+        filters: {
+          applied: params,
+          available: {
+            categories: [],
+            fileTypes: [],
+            tags: [],
+          },
+        },
+      };
+    }
+  },
+
+  // Fallback search function that searches locally through all assets
+  async fallbackSearch(params: SearchParams): Promise<AssetResponse> {
+    try {
+      console.log('Performing fallback search with params:', params);
+      const allAssets = await this.getAssets();
+      
+      if (!params.q) {
+        return {
+          assets: allAssets,
+          pagination: {
+            page: 1,
+            limit: allAssets.length,
+            total: allAssets.length,
+            totalPages: 1,
+            hasNext: false,
+            hasPrev: false,
+          },
+          filters: {
+            applied: params,
+            available: { categories: [], fileTypes: [], tags: [] },
+          },
+        };
+      }
+      
+      const query = params.q.toLowerCase();
+      const queryWords = query.split(/\s+/);
+      
+      const filteredAssets = allAssets.filter(asset => {
+        // Search in title
+        const titleMatch = asset.title?.toLowerCase().includes(query);
+        
+        // Search in description
+        const descMatch = asset.description?.toLowerCase().includes(query);
+        
+        // Search in tags (exact and partial matches)
+        const tagMatch = asset.tags?.some(tag => 
+          tag.toLowerCase().includes(query) || 
+          queryWords.some(word => tag.toLowerCase().includes(word))
+        );
+        
+        // Search for related content based on keywords
+        const relatedMatch = queryWords.some(word => {
+          return asset.title?.toLowerCase().includes(word) ||
+                 asset.description?.toLowerCase().includes(word) ||
+                 asset.tags?.some(tag => tag.toLowerCase().includes(word));
+        });
+        
+        // Apply category filter if specified
+        const categoryMatch = !params.category || asset.categoryId === params.category;
+        
+        // Apply premium filter if specified
+        const premiumMatch = params.isPremium === undefined || asset.isPremium === params.isPremium;
+        
+        return (titleMatch || descMatch || tagMatch || relatedMatch) && categoryMatch && premiumMatch;
+      });
+      
+      console.log(`Fallback search found ${filteredAssets.length} results for query: "${query}"`);
+      
+      return {
+        assets: filteredAssets,
+        pagination: {
+          page: 1,
+          limit: filteredAssets.length,
+          total: filteredAssets.length,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        },
+        filters: {
+          applied: params,
+          available: {
+            categories: [],
+            fileTypes: [],
+            tags: [],
+          },
+        },
+      };
+    } catch (error) {
+      console.error('Fallback search failed:', error);
       return {
         assets: [],
         pagination: {
