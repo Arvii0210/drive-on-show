@@ -1,20 +1,17 @@
 // src/pages/DownloadsPage.tsx
 import React, { useState, useEffect } from "react";
 import ProfileLayout from "@/components/ui/ProfileLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+
 import { useAuth } from "@/context/AuthContext";
+import { useSubscription } from "@/hooks/useSubscription";
 import { downloadService, DownloadRecord } from "@/services/downloadService";
+import {  formatFileType, getTimeUntilReset } from "@/lib/utils";
 import { 
   Download, 
-  Search, 
   Calendar, 
   FileImage,
-  Eye,
-  Heart,
-  Share2,
   MoreVertical
 } from "lucide-react";
 
@@ -22,12 +19,14 @@ const ITEMS_PER_PAGE = 6;
 
 const DownloadsPage: React.FC = () => {
   const { user } = useAuth();
+  const { userSubscription } = useSubscription();
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery] = useState("");
   const [downloads, setDownloads] = useState<DownloadRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(0);
   const [totalDownloads, setTotalDownloads] = useState(0);
+
 
   // Fetch user downloads
   useEffect(() => {
@@ -41,11 +40,19 @@ const DownloadsPage: React.FC = () => {
           currentPage, 
           ITEMS_PER_PAGE
         );
-        setDownloads(response.downloads);
-        setTotalPages(response.pagination.totalPages);
-        setTotalDownloads(response.pagination.total);
+        
+        // Add safety checks for the response structure
+        const downloadsArray = response?.downloads || [];
+        const pagination = response?.pagination || { totalPages: 0, total: 0 };
+        
+        setDownloads(downloadsArray);
+        setTotalPages(pagination.totalPages);
+        setTotalDownloads(pagination.total);
       } catch (error) {
         console.error('Failed to fetch downloads:', error);
+        setDownloads([]);
+        setTotalPages(0);
+        setTotalDownloads(0);
       } finally {
         setLoading(false);
       }
@@ -54,12 +61,14 @@ const DownloadsPage: React.FC = () => {
     fetchDownloads();
   }, [user, currentPage]);
 
-  const filteredDownloads = downloads.filter(item => {
-    return item.asset.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-           item.asset.category.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredDownloads = (downloads || []).filter(item => {
+      const categoryName = (item?.asset?.assetCategory);
+      
+    return item?.asset?.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+           categoryName.toLowerCase().includes(searchQuery.toLowerCase());
   });
 
-  const displayedDownloads = searchQuery ? filteredDownloads : downloads;
+  const displayedDownloads = searchQuery ? filteredDownloads : (downloads || []);
 
   return (
     <ProfileLayout>
@@ -76,17 +85,7 @@ const DownloadsPage: React.FC = () => {
             </p>
           </div>
           
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <Input
-              type="text"
-              placeholder="Search downloads..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 w-full sm:w-64"
-            />
-          </div>
+          
         </div>
 
         {/* Stats Card */}
@@ -101,6 +100,35 @@ const DownloadsPage: React.FC = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Quota Status Card */}
+        {userSubscription && (
+          <Card className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-green-600 dark:text-green-400">
+                    Daily Download Quota
+                  </p>
+                  <p className="text-lg font-bold text-green-900 dark:text-green-100">
+                    {userSubscription.remainingStandardDownloads || 0} Standard • {userSubscription.remainingPremiumDownloads || 0} Premium
+                  </p>
+                  <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+                    Resets in {getTimeUntilReset()}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm text-green-600 dark:text-green-400">
+                    {userSubscription.planType || 'Free'} Plan
+                  </p>
+                  <p className="text-xs text-green-600 dark:text-green-400">
+                    Daily Limit: {userSubscription.planType === 'PREMIUM' ? 'Unlimited' : '3'}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Loading State */}
         {loading ? (
@@ -138,16 +166,11 @@ const DownloadsPage: React.FC = () => {
               <Card key={item.id} className="group hover:shadow-xl transition-all duration-300 overflow-hidden">
                 <div className="relative">
                   <img
-                    src={item.asset.thumbnailUrl || '/placeholder.svg'}
+                    src={item.asset.thumbnail || item.asset.imageUrl || '/placeholder.svg'}
                     alt={item.asset.title}
                     className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <div className="absolute top-3 left-3">
-                    <Badge className="bg-blue-100 text-blue-600">
-                      <FileImage size={16} />
-                      <span className="ml-1">{item.isFree ? 'Free' : 'Premium'}</span>
-                    </Badge>
-                  </div>
+                  
                   <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <Button size="sm" variant="secondary" className="bg-white/90 backdrop-blur-sm">
                       <MoreVertical size={16} />
@@ -161,7 +184,14 @@ const DownloadsPage: React.FC = () => {
                       <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors">
                         {item.asset.title}
                       </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{item.asset.category}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {item.asset.assetCategory || 'Asset'}
+                      </p>
+                      {item.asset.fileType && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          File type: {formatFileType(item.asset.fileType)}
+                        </p>
+                      )}
                     </div>
                     
                     <div className="flex items-center justify-between text-sm text-gray-500">
@@ -169,28 +199,12 @@ const DownloadsPage: React.FC = () => {
                         <Calendar size={14} className="mr-1" />
                         {new Date(item.downloadedAt).toLocaleDateString()}
                       </div>
-                      <span>{item.category}</span>
+                      <span>
+                        {(item.asset.assetCategory)}
+                      </span>
                     </div>
                     
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                          <Download size={14} className="mr-1" />
-                          Re-download
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          <Eye size={14} />
-                        </Button>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Button size="sm" variant="ghost">
-                          <Heart size={14} />
-                        </Button>
-                        <Button size="sm" variant="ghost">
-                          <Share2 size={14} />
-                        </Button>
-                      </div>
-                    </div>
+                    
                   </div>
                 </CardContent>
               </Card>

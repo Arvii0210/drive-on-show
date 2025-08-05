@@ -148,14 +148,7 @@ const ImageViewPage = () => {
             >
               <Maximize2 className="w-4 h-4" />
             </Button>
-            <Button
-              variant="secondary"
-              size="icon"
-              onClick={handleShare}
-              className="bg-white/80 dark:bg-zinc-800/80 backdrop-blur"
-            >
-              <Share2 className="w-4 h-4" />
-            </Button>
+            
             <DownloadButton
               assetId={currentImage.id}
               isPremium={isPremium}
@@ -166,7 +159,7 @@ const ImageViewPage = () => {
           {/* Main Image */}
           <div className="flex justify-center">
             <img
-              src={imageSrc}
+              src={currentImage.src || currentImage.mainFile || '/placeholder.svg'}
               alt={currentImage.title}
               className="max-w-full max-h-[70vh] object-contain rounded-xl shadow-lg cursor-pointer"
               onClick={() => setShowZoom(true)}
@@ -185,27 +178,15 @@ const ImageViewPage = () => {
             
             {/* Stats */}
             <div className="flex flex-wrap gap-6 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <Eye className="w-4 h-4" />
-                {(currentImage.viewCount || 0).toLocaleString()} views
-              </div>
-              <div className="flex items-center gap-1">
-                <Download className="w-4 h-4" />
-                {(currentImage.downloadCount || 0)} downloads
-              </div>
+              
               <div className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
                 {currentImage.createdAt ? new Date(currentImage.createdAt).toLocaleDateString() : 'Unknown date'}
               </div>
-              <div className="text-sm">
-                {currentImage.dimensions ? 
-                  `Size: ${currentImage.dimensions.width}x${currentImage.dimensions.height}` : 
-                  'Size: Unknown'
-                }
-              </div>
-              {currentImage.fileType && (
+              
+              {currentImage.assetCategory && (
                 <div className="text-sm">
-                  Type: {currentImage.fileType.toUpperCase()}
+                  Type: {currentImage.assetCategory.toUpperCase()}
                 </div>
               )}
             </div>
@@ -246,6 +227,8 @@ const ImageViewPage = () => {
                     <p className="text-sm font-medium mt-2 truncate">
                       {image.title}
                     </p>
+
+                    
                   </div>
                 );
               })}
@@ -280,7 +263,7 @@ const ImageViewPage = () => {
       <Dialog open={showZoom} onOpenChange={setShowZoom}>
         <DialogContent className="max-w-[95vw] max-h-[95vh] p-2">
           <img
-            src={imageSrc}
+            src={currentImage.src || currentImage.mainFile || imageSrc}
             alt={currentImage.title}
             className="w-full h-full object-contain"
           />

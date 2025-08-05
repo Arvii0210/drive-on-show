@@ -29,10 +29,11 @@ export interface Asset {
     height: number;
   };
   tags?: string[];
-  downloadCount?: number;
-  viewCount?: number;
+ 
   thumbnail?: string;
   previewUrl?: string;
+  mainFile?: string; // Full-resolution image URL from backend
+  fileUrl?: string; // Alternative file URL field
   createdAt?: string;
   updatedAt?: string;
   metadata?: {
@@ -184,11 +185,11 @@ export const assetService = {
           id: assetData.id,
           title: assetData.title,
           description: assetData.description,
-          src: assetData.fileUrl || assetData.src || assetData.imageUrl,
-          thumbnail: assetData.thumbnailUrl || assetData.thumbnail || assetData.previewUrl,
-          previewUrl: assetData.previewUrl || assetData.thumbnailUrl || assetData.fileUrl,
-          isPremium: assetData.isPremium || assetData.premium || false,
-          isFree: assetData.isFree || !assetData.isPremium || false,
+          src: assetData.mainFile || assetData.fileUrl || assetData.src || assetData.imageUrl,
+          thumbnail: assetData.thumbnail || assetData.thumbnailUrl || assetData.previewUrl,
+          previewUrl: assetData.previewUrl || assetData.thumbnail || assetData.mainFile,
+          isPremium: assetData.isPremium || assetData.premium || assetData.assetCategory === 'PREMIUM' || false,
+          isFree: assetData.isFree || !assetData.isPremium || assetData.assetCategory === 'STANDARD' || false,
           assetCategory: assetData.assetCategory || (assetData.isPremium ? 'PREMIUM' : 'STANDARD'),
           categoryId: assetData.categoryId,
           category: assetData.category,
@@ -197,10 +198,8 @@ export const assetService = {
           fileSize: assetData.fileSize,
           dimensions: assetData.dimensions,
           tags: assetData.tags || [],
-          downloadCount: assetData.downloadCount || 0,
-          viewCount: assetData.viewCount || 0,
           createdAt: assetData.createdAt,
-          updatedAt: assetData.updatedAt
+          updatedAt: assetData.updatedAt,
         };
         
         console.log('Mapped asset:', mappedAsset);

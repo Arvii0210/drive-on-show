@@ -36,7 +36,8 @@ const ProfileLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           {/* User Info */}
           <div className="flex flex-col items-center gap-2 text-center">
             <img
-              src={user?.avatar || "assets/images/user-avatar.jpg"}
+                                src={user.avatar || "assets/images/user-avatar.jpg"}
+
               alt="avatar"
               className="w-16 h-16 rounded-full border"
             />

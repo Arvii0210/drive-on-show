@@ -669,7 +669,7 @@ const AssetList = () => {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                       
                       <img
-                        src={item.src || item.thumbnail || '/placeholder.svg'}
+                        src={item.src || item.mainFile || '/placeholder.svg'}
                         alt={item.title}
                         className="w-full object-cover transition-transform duration-700 group-hover:scale-110"
                         style={{ 
@@ -760,10 +760,10 @@ const AssetList = () => {
                         <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
                           <div className="flex items-center space-x-2">
                             <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                              {item.author?.name?.charAt(0) || "U"}
+                              {item.author?.name?.charAt(0) || "P"}
                             </div>
                             <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
-                              {item.author?.name || "Unknown"}
+                              {item.author?.name || "Pextee"}
                             </span>
                           </div>
                           
@@ -771,9 +771,7 @@ const AssetList = () => {
                             variant="secondary" 
                             className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-0"
                           >
-                            {item.assetCategory || 
-                             (typeof item.category === 'string' ? item.category : item.category?.name) || 
-                             'Asset'}
+                            {item.assetCategory || 'Asset'} 
                           </Badge>
                         </div>
                       </div>

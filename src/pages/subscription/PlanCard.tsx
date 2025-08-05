@@ -3,18 +3,18 @@
    ------------------------------------------------------------ */
    import React from "react";
    import { motion } from "framer-motion";
-   import { Badge } from "@/components/ui/badge2";
-   import { Button } from "@/components/ui/button";
-   import {
-     Sparkles,
-     CheckCircle2,
-     Check,
-     Calendar,
-     Gift,
-     Star,
-     Crown,
-     TrendingUp,
-   } from "lucide-react";
+import { Badge } from "@/components/ui/badge2";
+import { Button } from "@/components/ui/button";
+import {
+  Sparkles,
+  CheckCircle2,
+  Check,
+  Calendar,
+  Gift,
+  Star,
+  Crown,
+  TrendingUp,
+} from "lucide-react";
    
    /* tiny helper for 3-D tilt */
    function useTilt(max = 15) {
@@ -38,21 +38,21 @@
      }, [max]);
      return ref;
    }
-   
-   interface PlanCardProps {
-     id: string;
-     displayName: string;
-     type: string;
-     price: number;
-     premiumDownloads: number;
-     standardDownloads: number;
-     duration: number;
-     description?: string;
-     onBuy: () => void;
-     isActive: boolean;
-     isLoggedIn: boolean;
-     large?: boolean;
-     accent?: "green" | "purple" | "yellow" | "orange" | "blue";
+
+interface PlanCardProps {
+  id: string;
+  displayName: string;
+  type: string;
+  price: number;
+  premiumDownloads: number;
+  standardDownloads: number;
+  duration: number;
+  description?: string;
+  onBuy: () => void;
+  isActive: boolean;
+  isLoggedIn: boolean;
+  large?: boolean;
+  accent?: "green" | "purple" | "yellow" | "orange" | "blue";
      badge?: string; // e.g. “BEST VALUE”, “POPULAR”
    }
    
@@ -66,39 +66,39 @@
      yellow:  { from: "from-amber-400", to: "to-orange-500", ring: "ring-amber-400/60" },
      orange:  { from: "from-orange-500", to: "to-rose-500", ring: "ring-orange-500/60" },
    };
-   
-   const PlanCard: React.FC<PlanCardProps> = ({
-     displayName,
-     type,
-     price,
-     premiumDownloads,
-     standardDownloads,
-     duration,
-     description,
-     onBuy,
-     isActive,
-     isLoggedIn,
+
+const PlanCard: React.FC<PlanCardProps> = ({
+  displayName,
+  type,
+  price,
+  premiumDownloads,
+  standardDownloads,
+  duration,
+  description,
+  onBuy,
+  isActive,
+  isLoggedIn,
      large,
      accent = "blue",
-     badge,
-   }) => {
+  badge,
+}) => {
      /* -------------------------------------------------- helpers */
-     const isFree = type === "FREE";
+  const isFree = type === "FREE";
      const { from, to, ring } = accentMap[accent];
      const tiltRef = useTilt();
-   
-     const handleClick = () => {
+
+  const handleClick = () => {
        if (!isLoggedIn) window.location.href = "/login";
        else onBuy();
      };
    
      /* -------------------------------------------------- jsx */
-     return (
-       <motion.div
+  return (
+    <motion.div
          ref={tiltRef}
          whileHover={{ scale: 1.04 }}
          transition={{ type: "spring", stiffness: 260, damping: 18 }}
-         className={`
+        className={`
            relative isolate flex flex-col items-center text-center overflow-hidden
            rounded-3xl p-8 ${large ? "min-h-[520px]" : "min-h-[460px]"}
            bg-gradient-to-br ${from} ${to} shadow-lg
@@ -111,12 +111,12 @@
          <span className="pointer-events-none absolute -top-32 -right-32 size-72 rounded-full bg-white/20 blur-3xl" />
    
          {/* corner badge */}
-         {badge && (
+        {badge && (
            <Badge
              variant="primary"
              className="absolute top-5 right-5 z-10 px-3 py-1 text-xs font-bold bg-gradient-to-r from-yellow-400 to-orange-400 text-white shadow-md"
-           >
-             {badge === "BEST VALUE" ? (
+              >
+                {badge === "BEST VALUE" ? (
                <Crown className="inline w-4 h-4 -mt-0.5 mr-1" />
              ) : (
                <TrendingUp className="inline w-4 h-4 -mt-0.5 mr-1" />
@@ -132,8 +132,8 @@
            ) : (
              <Star className="size-7 stroke-yellow-500 fill-yellow-500/20" />
            )}
-         </div>
-   
+          </div>
+          
          {/* title & price */}
          <h3 className="relative z-10 mb-1 text-2xl font-extrabold">{displayName}</h3>
          <div className="relative z-10 mb-2 flex items-end justify-center gap-1">
@@ -148,12 +148,12 @@
    
          {/* feature list */}
          <ul className="relative z-10 mb-8 w-full space-y-2 text-left">
-           {premiumDownloads > 0 && (
+          {premiumDownloads > 0 && (
              <li className="flex items-center gap-2 font-medium text-indigo-600">
                <Sparkles size={18} /> {premiumDownloads} Premium downloads
              </li>
            )}
-           {standardDownloads > 0 && (
+          {standardDownloads > 0 && (
              <li className="flex items-center gap-2 font-medium text-emerald-600">
                <CheckCircle2 size={18} /> {standardDownloads} Standard downloads
              </li>
@@ -169,13 +169,13 @@
          </ul>
    
          {/* action button */}
-         <Button
+          <Button
            disabled={isActive}
-           onClick={handleClick}
-           className={`
+            onClick={handleClick}
+            className={`
              relative z-10 w-full justify-center rounded-xl py-3 text-base font-semibold
              transition-all duration-200
-             ${isActive
+              ${isActive
                ? "bg-zinc-300 dark:bg-zinc-700 text-zinc-500 cursor-not-allowed"
                : "bg-gradient-to-r from-sky-600 to-indigo-600 text-white hover:brightness-110 shadow-md"}
            `}
@@ -187,10 +187,9 @@
            ) : (
              isFree ? "Start for free" : "Choose plan"
            )}
-         </Button>
-       </motion.div>
-     );
-   };
-   
-   export default PlanCard;
-   
+          </Button>
+    </motion.div>
+  );
+};
+
+export default PlanCard;

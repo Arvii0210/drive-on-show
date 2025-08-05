@@ -43,7 +43,7 @@ const CategoryBrowser = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-              Explore Free Images
+              Explore Our Categories
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Loading categories...
@@ -71,7 +71,7 @@ const CategoryBrowser = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-              Explore Free Images
+              Explore Our Categories
             </h2>
             <p className="text-xl text-destructive">{error}</p>
           </div>
@@ -85,7 +85,7 @@ const CategoryBrowser = () => {
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-            Explore Free Images
+            Explore Our Categories
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Discover our most popular categories and find the perfect assets for your next creative project
