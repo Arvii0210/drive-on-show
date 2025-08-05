@@ -44,18 +44,24 @@ export const useDownload = (refreshSubscription?: () => void) => {
         let title = "Download Failed";
         let description = eligibility?.reason || "Unable to download this asset";
         
-        // Handle specific quota and subscription scenarios
+        // Get user subscription status to determine user type
+        const isPremiumUser = userSubscription && userSubscription.planType !== 'FREE';
+        
+        // Handle specific scenarios based on user type and asset type
         if (eligibility?.reason?.includes("quota") || eligibility?.reason?.includes("limit")) {
-          title = "Credit Exceeded";
-          if (eligibility.quotaInfo) {
-            const resetTime = new Date(eligibility.quotaInfo.resetTime).toLocaleTimeString();
-            description = `Daily limit reached. Credit resets at ${resetTime}. Try again tomorrow.`;
+          if (isPremiumUser) {
+            // Premium user quota exceeded
+            title = "Quota Exceeded";
+            description = "Quota exceeded. Please wait for renewal";
           } else {
-            description = "You've reached your daily download limit. Try again tomorrow.";
+            // Free user quota exceeded
+            title = "Quota Exceeded";
+            description = "Quota exceeded. Upgrade to continue.";
           }
         } else if (eligibility?.reason?.includes("premium") || eligibility?.reason?.includes("upgrade")) {
+          // Free user trying to download premium asset
           title = "Upgrade Required";
-          description = "Upgrade to a premium plan to download premium assets.";
+          description = "Upgrade to Premium to download.";
         } else if (eligibility?.reason?.includes("subscription")) {
           title = "Subscription Required";
           description = "A valid subscription is required to download this asset.";
