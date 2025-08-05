@@ -49,19 +49,29 @@ export const useDownload = (refreshSubscription?: () => void) => {
         
         // Handle specific scenarios based on user type and asset type
         if (eligibility?.reason?.includes("quota") || eligibility?.reason?.includes("limit")) {
-          if (isPremiumUser) {
-            // Premium user quota exceeded
-            title = "Quota Exceeded";
-            description = "Quota exceeded. Please wait for renewal";
-          } else {
-            // Free user quota exceeded
-            title = "Quota Exceeded";
-            description = "Quota exceeded. Upgrade to continue.";
-          }
-        } else if (eligibility?.reason?.includes("premium") || eligibility?.reason?.includes("upgrade")) {
-          // Free user trying to download premium asset
-          title = "Upgrade Required";
-          description = "Upgrade to Premium to download.";
+          // Prioritize premium asset error handling
+if (type === "premium" && !isPremiumUser) {
+  title = "Upgrade Required";
+  description = "Upgrade to Premium to download.";
+} 
+else if (eligibility?.reason?.includes("premium") || eligibility?.reason?.includes("upgrade")) {
+  title = "Upgrade Required";
+  description = "Upgrade to Premium to download.";
+} 
+else if (eligibility?.reason?.includes("quota") || eligibility?.reason?.includes("limit")) {
+  if (isPremiumUser) {
+    title = "Quota Exceeded";
+    description = "Quota exceeded. Please wait for renewal";
+  } else {
+    title = "Quota Exceeded";
+    description = "Quota exceeded. Upgrade to continue.";
+  }
+} 
+else if (eligibility?.reason?.includes("subscription")) {
+  title = "Subscription Required";
+  description = "A valid subscription is required to download this asset.";
+}
+
         } else if (eligibility?.reason?.includes("subscription")) {
           title = "Subscription Required";
           description = "A valid subscription is required to download this asset.";
