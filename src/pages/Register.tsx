@@ -19,7 +19,7 @@ import {
   Users,
   Download
 } from "lucide-react";
-import { signup } from "@/lib/authService";
+import { signup } from "@/services/authService";
 
 const Register = () => {
   const navigate = useNavigate();

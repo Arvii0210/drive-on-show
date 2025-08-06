@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { verifyOtp } from "@/lib/authService";
+import { verifyOtp } from "@/services/authService";
 import { 
   Shield, 
   Mail, 

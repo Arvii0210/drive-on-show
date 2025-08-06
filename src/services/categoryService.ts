@@ -12,7 +12,7 @@ export interface Category {
   };
 }
 
-const API_BASE_URL = API_CONFIG.CATEGORIES;
+  const API_BASE_URL = API_CONFIG.CATEGORIES;
 
 export const categoryService = {
   async getCategories(): Promise<Category[]> {

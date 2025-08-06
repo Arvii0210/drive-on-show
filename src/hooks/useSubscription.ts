@@ -4,7 +4,7 @@ import {
   getAllPlans,
   getUserSubscription,
   createSubscription as svcCreate,
-} from "@/lib/subscriptionService"; 
+} from "@/services/subscriptionService"; 
 
 
 import confetti from "canvas-confetti";

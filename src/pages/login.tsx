@@ -19,8 +19,8 @@ import {
   Download,
   Heart
 } from "lucide-react";
-import { loginWithEmail, googleLogin } from "@/lib/authService";
-import { createSubscription, getUserSubscription } from "@/lib/subscriptionService";
+import { loginWithEmail, googleLogin } from "@/services/authService";
+import { createSubscription, getUserSubscription } from "@/services/subscriptionService";
 
 const Login = () => {
   const [email, setEmail] = useState("");

@@ -14,7 +14,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
-import { getUserSubscription } from "@/lib/subscriptionService";
+import { getUserSubscription } from "@/services/subscriptionService";
 
 const Header = () => {
   const [searchText, setSearchText] = useState("");
