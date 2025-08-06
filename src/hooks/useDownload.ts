@@ -48,29 +48,32 @@ export const useDownload = (refreshSubscription?: () => void) => {
         const isPremiumUser = userSubscription && userSubscription.planType !== 'FREE';
         
         // Handle specific scenarios based on user type and asset type
-        if (eligibility?.reason?.includes("quota") || eligibility?.reason?.includes("limit")) {
+        if (eligibility?.reason?.includes("Daily free download limit exceeded")) {
+          title = "Daily Limit Exceeded";
+          description = "Daily free download limit exceeded. Try again tomorrow.";
+        } else if (eligibility?.reason?.includes("quota") || eligibility?.reason?.includes("limit")) {
           // Prioritize premium asset error handling
-if (type === "premium" && !isPremiumUser) {
-  title = "Upgrade Required";
-  description = "Upgrade to Premium to download.";
-} 
-else if (eligibility?.reason?.includes("premium") || eligibility?.reason?.includes("upgrade")) {
-  title = "Upgrade Required";
-  description = "Upgrade to Premium to download.";
-} 
-else if (eligibility?.reason?.includes("quota") || eligibility?.reason?.includes("limit")) {
-  if (isPremiumUser) {
-    title = "Quota Exceeded";
-    description = "Quota exceeded. Please wait for renewal";
-  } else {
-    title = "Quota Exceeded";
-    description = "Quota exceeded. Upgrade to continue.";
-  }
-} 
-else if (eligibility?.reason?.includes("subscription")) {
-  title = "Subscription Required";
-  description = "A valid subscription is required to download this asset.";
-}
+          if (type === "premium" && !isPremiumUser) {
+            title = "Upgrade Required";
+            description = "Upgrade to Premium to download.";
+          } 
+          else if (eligibility?.reason?.includes("premium") || eligibility?.reason?.includes("upgrade")) {
+            title = "Upgrade Required";
+            description = "Upgrade to Premium to download.";
+          } 
+          else if (eligibility?.reason?.includes("quota") || eligibility?.reason?.includes("limit")) {
+            if (isPremiumUser) {
+              title = "Quota Exceeded";
+              description = "Quota exceeded. Please wait for renewal";
+            } else {
+              title = "Quota Exceeded";
+              description = "Quota exceeded. Upgrade to continue.";
+            }
+          } 
+          else if (eligibility?.reason?.includes("subscription")) {
+            title = "Subscription Required";
+            description = "A valid subscription is required to download this asset.";
+          }
 
         } else if (eligibility?.reason?.includes("subscription")) {
           title = "Subscription Required";
@@ -89,6 +92,18 @@ else if (eligibility?.reason?.includes("subscription")) {
           toast({
             title: "Credit Warning",
             description: `You have ${remainingToday} downloads remaining today.`,
+            variant: "default"
+          });
+        }
+      }
+
+      // Show daily free download quota for FREE users
+      if (eligibility.planType === 'FREE' && eligibility.dailyFreeDownloads !== undefined) {
+        const remaining = 3 - eligibility.dailyFreeDownloads;
+        if (remaining <= 1 && remaining > 0) {
+          toast({
+            title: "Free Downloads Remaining",
+            description: `You have ${remaining} free download${remaining === 1 ? '' : 's'} left today.`,
             variant: "default"
           });
         }
@@ -205,7 +220,12 @@ if (!downloadResult || !fileUrl) {
       let errorMessage = "Something went wrong. Please try again.";
       
       if (error instanceof Error) {
-        errorMessage = error.message;
+        // Handle specific daily limit error
+        if (error.message.includes("Daily free download limit exceeded")) {
+          errorMessage = "Daily free download limit exceeded. Try again tomorrow.";
+        } else {
+          errorMessage = error.message;
+        }
       }
       
       toast({ 

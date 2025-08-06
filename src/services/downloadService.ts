@@ -16,6 +16,9 @@ export interface DownloadEligibility {
     remainingToday: number;
     resetTime: string;
   };
+  dailyFreeDownloads?: number;
+  lastFreeDownloadDate?: string;
+  planType?: 'FREE' | 'PREMIUM' | 'LITE';
 }
 
 export interface DownloadRecord {
@@ -117,7 +120,11 @@ export const downloadService = {
         if (error.response?.status === 401) {
           throw new Error('Authentication failed. Please login again.');
         } else if (error.response?.status === 403) {
-          throw new Error('You don\'t have permission to access this asset.');
+          const errorData = error.response?.data;
+          if (errorData?.message?.includes('Daily free download limit exceeded')) {
+            throw new Error('Daily free download limit exceeded. Try again tomorrow.');
+          }
+          throw new Error(errorData?.message || 'You don\'t have permission to access this asset.');
         } else if (error.response?.status === 404) {
           throw new Error('Asset not found.');
         } else if (error.response?.data?.message) {
@@ -190,7 +197,11 @@ export const downloadService = {
         if (error.response?.status === 401) {
           throw new Error('Authentication failed. Please login again.');
         } else if (error.response?.status === 403) {
-          throw new Error('You don\'t have permission to download this asset.');
+          const errorData = error.response?.data;
+          if (errorData?.message?.includes('Daily free download limit exceeded')) {
+            throw new Error('Daily free download limit exceeded. Try again tomorrow.');
+          }
+          throw new Error(errorData?.message || 'You don\'t have permission to download this asset.');
         } else if (error.response?.status === 404) {
           throw new Error('Asset not found.');
         } else if (error.response?.status === 500) {
