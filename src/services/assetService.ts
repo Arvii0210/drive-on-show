@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { API_CONFIG } from '../config/api';
 
-const API_BASE_URL = 'http://localhost:3000/api/asset'; // Make sure this matches your backend route
+const API_BASE_URL = API_CONFIG.ASSETS; // Make sure this matches your backend route
 
 // Asset interface based on the expected API response
 export interface Asset {

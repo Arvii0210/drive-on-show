@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { API_CONFIG } from '../config/api';
 
 export interface Category {
   id: string;
@@ -11,7 +12,7 @@ export interface Category {
   };
 }
 
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = API_CONFIG.CATEGORIES;
 
 export const categoryService = {
   async getCategories(): Promise<Category[]> {

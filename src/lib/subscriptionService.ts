@@ -1,13 +1,14 @@
 // src/lib/subscriptionService.ts
 import axios from "axios";
+import { API_CONFIG } from "../config/api";
 
 const subApi = axios.create({
-  baseURL: "http://localhost:3000/api/subscription",
+  baseURL: API_CONFIG.SUBSCRIPTION,
   headers: { "Content-Type": "application/json" },
 });
 
 const plansApi = axios.create({
-  baseURL: "http://localhost:3000/api/subscription-plans",
+  baseURL: API_CONFIG.SUBSCRIPTION_PLANS,
   headers: { "Content-Type": "application/json" },
 });
 
