@@ -272,12 +272,11 @@ const AddOwnPublishing = () => {
         personId: personId,
         personRole: roleToPersonType(formData.role),
         orderType: formData.orderType as OrderType,
-        discount: formData.percentage ? parseInt(formData.percentage) : undefined,
-        customPercentage: formData.customPercentage
+        numberOfCopies: Number(formData.numberOfCopies),
+        bookPrice: formData.bookPrice ? parseFloat(formData.bookPrice.toString()) : 0,
+        percentage: formData.customPercentage
           ? parseFloat(formData.customPercentage)
           : undefined,
-        numberOfCopies: Number(formData.numberOfCopies),
-        // Include any other required fields from your API model
       };
 
       await OwnPublishingService.create(payload);

@@ -180,8 +180,6 @@ rightsType: "" as RightsType
   setBooks(data.map(b => ({ id: b.id, name: b.name })));
 } else if (Array.isArray(data.books)) {
   setBooks(data.books.map(b => ({ id: b.id, name: b.name })));
-} else if (Array.isArray(data.data?.books)) {
-  setBooks(data.data.books.map(b => ({ id: b.id, name: b.name })));
 } else {
   setBooks([]);
 }

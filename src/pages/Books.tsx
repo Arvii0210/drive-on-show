@@ -50,8 +50,8 @@ const Books = () => {
     try {
       setLoading(true);
       const response = await getBooks();
-      setBooks(response.data.books || []);
-      console.log("Fetched books:", response.data.books);
+      setBooks(response.books || []);
+      console.log("Fetched books:", response.books);
     } catch (error: any) {
       toast({
         title: 'Error',
