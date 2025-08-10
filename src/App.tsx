@@ -1,87 +1,89 @@
-// src/App.tsx
 
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import Login from "./pages/Login";
+import DashboardLayout from "./components/DashboardLayout";
+import Dashboard from "./pages/Dashboard";
+import People from "./pages/People";
+import AddPerson from "./pages/AddPerson";
 
-import { AuthProvider } from "@/context/AuthContext";
-import PrivateRoute from "@/components/ui/PrivateRoute";
-import ScrollToTop from "@/components/ui/ScrollToTop";
+import Books from "./pages/Books";
 
-// Pages
-import Index from "@/pages/Index";
-import AssetList from "@/pages/Assest-list";
-import Category from "@/pages/Category";
-import Login from "./pages/login";
-import Register from "@/pages/Register"; 
-import NotFound from "@/pages/NotFound";
-import AccountPage from "@/pages/AccountPage";
-import DownloadsPage from "@/pages/DownloadsPage";
-import PlanPage from "@/pages/PlanPage";
-import ImageViewPage from "@/pages/ImageViewPage";
-import VerifyOtp from "./pages/Verifyotp";
-import SubscriptionPlansPage from "./pages/subscription/SubscriptionPlansPage";
-import { ToastContainer } from "react-toastify";
+import AddBook from "./pages/AddBook";
+
+import OwnPublishing from "./pages/OwnPublishing";
+import AddOwnPublishing from "./pages/AddOwnPublishing";
+import { AuthProvider } from "./contexts/AuthContext";
+import AddSellingRight from "./pages/AddSellingRight";
+import Reports from "./pages/Reports";
+import AddBuyingRights from "./pages/AddBuyingRights";
+import Agreements from "./pages/Agreements";
+import ScrollToTop from "./components/ui/ScrollToTop";
 
 const queryClient = new QueryClient();
 
-const App = () => {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
+
+
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <AuthProvider>
         <Toaster />
         <Sonner />
-        <AuthProvider>
-          <BrowserRouter>
-            <ScrollToTop />
-            <Routes>
-              {/* Public Pages */}
-              <Route path="/" element={<Index />} />
-              <Route path="/category" element={<Category />} />
-              <Route path="/photos" element={<AssetList />} />
-              <Route path="/plans" element={<SubscriptionPlansPage />} />
-              <Route path="/image/:id" element={<ImageViewPage />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/verify-otp" element={<VerifyOtp />} />
+        <BrowserRouter>
+          <ScrollToTop />
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/" element={
+              <SidebarProvider>
+                <DashboardLayout />
+              </SidebarProvider>
+            }>
+              <Route index element={<Dashboard />} />
+              
+              {/* People Management */}
+              <Route path="people" element={<People />} />
+              <Route path="people/add" element={<AddPerson />} />
+              <Route path="people/edit/:id" element={<AddPerson />} />
+              
+              {/* Books */}
+              <Route path="books" element={<Books />} />
+              <Route path="books/add" element={<AddBook />} />
+              <Route path="books/edit/:id" element={<AddBook />} />
 
-              {/* Protected Profile Pages */}
-              <Route
-                path="/profile/account"
-                element={
-                  <PrivateRoute>
-                    <AccountPage />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/profile/downloads"
-                element={
-                  <PrivateRoute>
-                    <DownloadsPage />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/profile/plan"
-                element={
-                  <PrivateRoute>
-                    <PlanPage />
-                  </PrivateRoute>
-                }
-              />
+              
+              
 
-              {/* Fallback */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <ToastContainer />
-          </BrowserRouter>
-        </AuthProvider>
-      </TooltipProvider>
-    </QueryClientProvider>
-  );
-};
+              
+              
+              {/* Rights Management (existing) */}
+              <Route path="rights/own-publishing" element={<OwnPublishing />} />
+              <Route path="rights/own-publishing/add" element={<AddOwnPublishing />} />
+              <Route path="/rights/selling-rights/add" element={<AddSellingRight />} />
+              <Route path="/rights/buying-rights/add" element={<AddBuyingRights />} />
+              <Route path="/rights/buying-rights/edit/:id" element={<AddBuyingRights />} />
+              <Route path="/rights/selling-rights/edit/:id" element={<AddSellingRight />} />
+              
+              {/* New Modules */}
+              <Route path="agreements" element={<Agreements />} />
+              <Route path="agreements/add" element={<div className="p-6 text-center"><h2 className="text-2xl font-bold">Add Agreement - Coming Soon</h2></div>} />
+              <Route path="royalty-calculations" element={<OwnPublishing />} />
+              <Route path="renewals" element={<div className="p-6 text-center"><h2 className="text-2xl font-bold">Agreement Renewals - Coming Soon</h2></div>} />
+              <Route path="settings" element={<div className="p-6 text-center"><h2 className="text-2xl font-bold">Master Settings - Coming Soon</h2></div>} />
+              <Route path="/reports" element={<Reports />} />
+              
+              <Route path="*" element={<div>404 Not Found</div>} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
 
 export default App;
