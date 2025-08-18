@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Keerthi-Fab Admin Dashboard</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Google Font Link -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- FontAwesome Icons -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <style>
+    body {
+      background: linear-gradient(135deg, #f0f4ff, #d9e4f5);
+      min-height: 100vh;
+      font-family: "Poppins", sans-serif;
+    }
+
+    #wrapper {
+      display: flex;
+      width: 100%;
+      align-items: stretch;
+    }
+
+    #sidebar-wrapper {
+      min-width: 260px;
+      max-width: 260px;
+      height: 100vh;
+      background: #ffffff;
+      border-right: 1px solid #ddd;
+      transition: transform 0.3s ease;
+    }
+
+    #wrapper.toggled #sidebar-wrapper {
+      transform: translateX(-260px);
+    }
+
+    #page-content-wrapper {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .sidebar .list-group-item {
+      border: none;
+      font-weight: 500;
+      color: #333;
+      background: transparent;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    .sidebar .list-group-item i {
+      width: 20px;
+    }
+
+    /* .sidebar .list-group-item:hover,
+  .sidebar .list-group-item.active {
+    background: #007bff;
+    color: white;
+  } */
+
+    .navbar {
+      padding: 1rem;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .glass-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 50px rgba(0, 0, 0, 0.15);
+    }
+
+    h6 {
+      color: #666;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    h3 {
+      color: #007bff;
+      font-weight: bold;
+    }
+
+    .user-info img {
+      width: 90px;
+      height: 90px;
+      object-fit: cover;
+      border: 2px solid #007bff;
+    }
+
+    .user-info h6 {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .user-info small {
+      font-size: 0.8rem;
+      color: #888;
+    }
+
+    /* Sidebar Responsive */
+    @media (max-width: 768px) {
+      #sidebar-wrapper {
+        position: absolute;
+        margin-left: -260px;
+      }
+
+      #wrapper.toggled #sidebar-wrapper {
+        margin-left: 0;
+      }
+    }
+
+    /* Button Hover Effect */
+    .btn-primary:hover,
+    .btn-success:hover,
+    .btn-warning:hover {
+      opacity: 0.9;
+    }
+
+    /* Responsive Design for Mobile */
+    @media (max-width: 768px) {
+      #wrapper {
+        padding-left: 0;
+      }
+
+      .navbar {
+        padding-left: 15px;
+        padding-right: 15px;
+      }
+
+      .sidebar .list-group-item {
+        padding: 15px 20px;
+      }
+
+      .glass-card {
+        margin-bottom: 15px;
+      }
+
+      .user-info img {
+        width: 80px;
+        height: 80px;
+      }
+
+      .glass-card {
+        padding: 20px;
+      }
+
+      .row.g-4 {
+        margin-top: 15px;
+      }
+
+      .btn-primary {
+        width: 100%;
+      }
+    }
+
+    /* Hover Effect for Sidebar Items */
+    .sidebar .list-group-item:hover {
+      background: #0056b3;
+      color: white;
+    }
+
+    /* Hover Effect for Logout Button */
+    .btn-danger:hover {
+      opacity: 0.8;
+      background-color: #dc3545;
+    }
+
+    /* Hide Tiles */
+    .hide-tile {
+      display: none;
+    }
+
+    .hide-section {
+      display: none;
+    }
+
+    .show-section {
+      display: block;
+    }
+  </style>
+
+  <body>
+    <div class="d-flex" id="wrapper">
+      <!-- Sidebar -->
+      <div class="bg-light sidebar shadow" id="sidebar-wrapper">
+        <div class="sidebar-heading text-primary fw-bold fs-4 p-4 text-center">
+          Keerthi-Fab
+        </div>
+
+        <div class="user-info text-center p-3">
+          <img
+            src="/photos/person.png"
+            class="rounded-circle mb-3"
+            alt="User"
+            style="
+              width: 120px;
+              height: 120px;
+              object-fit: cover;
+              border: 3px solid #007bff;
+            "
+          />
+          <h6 class="mb-0" style="font-size: 1.1rem; color: #333">
+            Macha User
+          </h6>
+          <small class="text-muted" style="font-size: 0.9rem"
+            >machauser@example.com</small
+          >
+        </div>
+
+        <div class="container-fluid py-4">
+          <div class="row g-4">
+            <!-- Menu Links -->
+            <div class="col-lg-12">
+              <div class="list-group">
+                <a
+                  href="#"
+                  class="list-group-item list-group-item-action active"
+                  id="dashboard-link"
+                >
+                  <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a
+                  href="#"
+                  class="list-group-item list-group-item-action"
+                  id="projects-link"
+                >
+                  <i class="fas fa-briefcase"></i> Latest Projects
+                </a>
+                <a
+                  href="#"
+                  class="list-group-item list-group-item-action"
+                  id="blog-link"
+                >
+                  <i class="fas fa-blog"></i> Blog
+                </a>
+                <a
+                  href="#"
+                  class="list-group-item list-group-item-action"
+                  id="gallery-link"
+                >
+                  <i class="fas fa-images"></i> Gallery
+                </a>
+              </div>
+            </div>
+
+            <!-- Logout Button -->
+            <div class="col-lg-12 mt-3">
+              <a href="#" class="btn btn-danger w-100">
+                <i class="fas fa-sign-out-alt"></i> Logout
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page Content -->
+      <div id="page-content-wrapper">
+        <nav class="navbar navbar-light bg-white shadow-sm p-3">
+          <div class="container-fluid">
+            <button class="btn btn-outline-primary" id="menu-toggle">
+              <i class="fas fa-bars"></i>
+            </button>
+            <h5 class="ms-3 my-0 fw-bold text-primary">Admin Dashboard</h5>
+          </div>
+        </nav>
+
+        <div class="container-fluid py-4">
+          <div class="tab-content" id="tab-content">
+            <!-- Dashboard Tab -->
+            <div class="tab-pane active" id="dashboard-tab">
+              <div class="row g-4 justify-content-around">
+                <div
+                  id="projects-tile"
+                  class="col-lg-3 col-md-4 col-sm-12 dashboard-tile"
+                >
+                  <div class="glass-card text-center p-4">
+                    <i class="fas fa-briefcase fa-2x mb-2 text-primary"></i>
+                    <h6>Total Projects</h6>
+                    <h3>3</h3>
+                  </div>
+                </div>
+
+                <div
+                  id="blogs-tile"
+                  class="col-lg-3 col-md-4 col-sm-12 dashboard-tile"
+                >
+                  <div class="glass-card text-center p-4">
+                    <i class="fas fa-blog fa-2x mb-2 text-info"></i>
+                    <h6>Total Blogs</h6>
+                    <h3>10</h3>
+                  </div>
+                </div>
+
+                <div
+                  id="gallery-tile"
+                  class="col-lg-3 col-md-4 col-sm-12 dashboard-tile"
+                >
+                  <div class="glass-card text-center p-4">
+                    <i class="fas fa-images fa-2x mb-2 text-warning"></i>
+                    <h6>Total Gallery</h6>
+                    <h3>5</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Projects Tab -->
+
+            <div class="tab-pane" id="projects-tab">
+              <h5 class="text-primary mb-1 text-start" style="font-weight: 700">
+                Latest Projects
+              </h5>
+
+              <!-- Image Upload Form -->
+              <form
+                id="image-upload-form"
+                class="form-container"
+                style="
+                  max-width: 1000px;
+                  margin: auto;
+                  padding: 10px;
+                  border-radius: 10px;
+                "
+              >
+                <div class="row align-items-center g-3">
+                  <div class="col-md-4">
+                    <label
+                      for="project-name"
+                      class="form-label"
+                      style="font-weight: bold; color: #333"
+                      >Project Name</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="project-name"
+                      required
+                    />
+                  </div>
+
+                  <div class="col-md-4">
+                    <label
+                      for="image-upload"
+                      class="form-label"
+                      style="font-weight: bold; color: #333"
+                      >Upload Project Image</label
+                    >
+                    <input
+                      type="file"
+                      class="form-control"
+                      id="image-upload"
+                      accept="image/*"
+                      required
+                    />
+                  </div>
+
+                  <div class="col-md-4">
+                    <label
+                      for="project-location"
+                      class="form-label"
+                      style="font-weight: bold; color: #333"
+                      >Location</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="project-location"
+                      required
+                    />
+                  </div>
+
+                  <div class="col-md-12">
+                    <label
+                      for="project-description"
+                      class="form-label"
+                      style="font-weight: bold; color: #333"
+                      >Description</label
+                    >
+                    <textarea
+                      class="form-control"
+                      id="project-description"
+                      rows="3"
+                      required
+                    ></textarea>
+                  </div>
+
+                  <div class="col-md-12 d-flex justify-content-center">
+                    <button type="submit" class="btn btn-primary w-25">
+                      Submit
+                    </button>
+                  </div>
+                </div>
+
+                <div id="image-preview" class="mt-4 text-center">
+                  <img
+                    id="selected-image"
+                    src=""
+                    alt="Selected Image"
+                    class="img-fluid"
+                    style="
+                      max-width: 100px;
+                      border-radius: 8px;
+                      border: 2px solid #ddd;
+                    "
+                  />
+                </div>
+              </form>
+
+              <!-- Project Cards Container -->
+              <div
+  id="project-cards-container"
+  style="
+    height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    padding: 15px;
+    background-color: #f9f9f9;
+  "
+>
+  <div id="project-cards" class="row gx-3 gy-3">
+    <!-- Cards will be dynamically inserted here -->
+  </div>
+</div>
+
+              <!-- Project Update Modal -->
+              <div
+                id="edit-project-modal"
+                style="
+                  display: none;
+                  position: fixed;
+                  top: 10%;
+                  left: 50%;
+                  transform: translateX(-50%);
+                  background: white;
+                  padding: 20px;
+                  border-radius: 10px;
+                  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+                  z-index: 1000;
+                "
+              >
+                <h5>Edit Project</h5>
+                <form id="edit-project-form">
+                  <input type="hidden" id="edit-project-id" />
+                  <div class="mb-3">
+                    <label for="edit-project-name" class="form-label"
+                      >Project Name</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="edit-project-name"
+                      required
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="edit-project-image" class="form-label">Upload New Image (optional)</label>
+                    <input
+                      type="file"
+                      class="form-control"
+                      id="edit-project-image"
+                      accept="image/*"
+                    />
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label for="edit-project-location" class="form-label"
+                      >Location</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="edit-project-location"
+                      required
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="edit-project-description" class="form-label"
+                      >Description</label
+                    >
+                    <textarea
+                      class="form-control"
+                      id="edit-project-description"
+                      rows="3"
+                      required
+                    ></textarea>
+                  </div>
+                  <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-primary">
+                      Update
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-secondary"
+                      onclick="closeEditModal()"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+              <div
+                id="overlay"
+                style="
+                  display: none;
+                  position: fixed;
+                  top: 0;
+                  left: 0;
+                  width: 100%;
+                  height: 100%;
+                  background: rgba(0, 0, 0, 0.5);
+                  z-index: 999;
+                "
+              ></div>
+
+              <script>
+                const token = localStorage.getItem("token");
+              
+                // Image preview
+                document.getElementById("image-upload").addEventListener("change", function (event) {
+                  const file = event.target.files[0];
+                  if (file) {
+                    document.getElementById("selected-image").src = URL.createObjectURL(file);
+                  }
+                });
+              
+                // Create project
+                document.getElementById("image-upload-form").addEventListener("submit", async function (e) {
+                  e.preventDefault();
+              
+                  const formData = new FormData();
+                  formData.append("title", document.getElementById("project-name").value);
+                  formData.append("image", document.getElementById("image-upload").files[0]);
+                  formData.append("location", document.getElementById("project-location").value);
+                  formData.append("description", document.getElementById("project-description").value);
+              
+                  try {
+                    const response = await fetch("http://localhost:5000/api/latest-projects/add", {
+                      method: "POST",
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: formData,
+                    });
+              
+                    const result = await response.json();
+                    if (response.ok) {
+                      Swal.fire({
+                        icon: "success",
+                        title: "Project Created!",
+                        toast: true,
+                        position: "top-end",
+                        showConfirmButton: false,
+                        timer: 2000
+                      });
+                      fetchProjects();
+                      this.reset();
+                      document.getElementById("selected-image").src = "";
+                    } else {
+                      Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: result.message,
+                      });
+                    }
+                  } catch (error) {
+                    console.error("Create error:", error);
+                    Swal.fire({
+                      icon: "error",
+                      title: "Error",
+                      text: "An error occurred.",
+                    });
+                  }
+                });
+              
+                // Fetch projects
+                async function fetchProjects() {
+                  try {
+                    const response = await fetch("http://localhost:5000/api/latest-projects/all");
+                    const projects = await response.json();
+              
+                    const container = document.getElementById("project-cards");
+                    container.innerHTML = "";
+              
+                    projects.forEach((project) => {
+                      const card = `
+                        <div class="col-12 col-sm-6 col-md-4">
+                          <div class="card h-100 shadow-sm">
+                            <img src="${project.image}" class="card-img-top" alt="Project Image" style="object-fit: cover; height: 180px;">
+                            <div class="card-body d-flex flex-column">
+                              <h5 class="card-title">${project.title}</h5>
+                              <p class="card-text">${project.description || ""}</p>
+                              <p class="card-text"><small class="text-muted">${project.location || ""}</small></p>
+                              <div class="mt-auto d-flex justify-content-between">
+                                <button class="btn btn-warning btn-sm" onclick='openEditModal(${JSON.stringify(project)})'>Edit</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteProject(${project.id})">Delete</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      `;
+                      container.innerHTML += card;
+                    });
+                  } catch (error) {
+                    console.error("Fetch error:", error);
+                  }
+                }
+              
+                // Delete project
+                async function deleteProject(id) {
+                  Swal.fire({
+                    title: "Are you sure?",
+                    text: "This project will be permanently deleted!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, delete it!",
+                  }).then(async (result) => {
+                    if (result.isConfirmed) {
+                      try {
+                        const res = await fetch(`http://localhost:5000/api/latest-projects/${id}`, {
+                          method: "DELETE",
+                          headers: {
+                            Authorization: `Bearer ${token}`,
+                          },
+                        });
+                        const result = await res.json();
+                        if (res.ok) {
+                          Swal.fire({
+                            icon: "success",
+                            title: "Deleted!",
+                            toast: true,
+                            position: "top-end",
+                            showConfirmButton: false,
+                            timer: 2000
+                          });
+                          fetchProjects();
+                        } else {
+                          Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: result.message,
+                          });
+                        }
+                      } catch (err) {
+                        console.error("Delete error:", err);
+                        Swal.fire({
+                          icon: "error",
+                          title: "Error",
+                          text: "An error occurred.",
+                        });
+                      }
+                    }
+                  });
+                }
+              
+                // Open modal for editing
+                function openEditModal(project) {
+                  document.getElementById("edit-project-id").value = project.id;
+                  document.getElementById("edit-project-name").value = project.title;
+                  document.getElementById("edit-project-location").value = project.location || "";
+                  document.getElementById("edit-project-description").value = project.description || "";
+                  document.getElementById("edit-project-image").value = "";
+                  document.getElementById("edit-project-modal").style.display = "block";
+                  document.getElementById("overlay").style.display = "block";
+                }
+              
+                // Close modal
+                function closeEditModal() {
+                  document.getElementById("edit-project-modal").style.display = "none";
+                  document.getElementById("overlay").style.display = "none";
+                }
+              
+                // Handle update submit
+                document.getElementById("edit-project-form").addEventListener("submit", async function (e) {
+                  e.preventDefault();
+              
+                  const id = document.getElementById("edit-project-id").value;
+                  const formData = new FormData();
+                  formData.append("title", document.getElementById("edit-project-name").value);
+                  formData.append("location", document.getElementById("edit-project-location").value);
+                  formData.append("description", document.getElementById("edit-project-description").value);
+              
+                  const fileInput = document.getElementById("edit-project-image");
+                  if (fileInput.files.length > 0) {
+                    formData.append("image", fileInput.files[0]);
+                  }
+              
+                  try {
+                    const response = await fetch(`http://localhost:5000/api/latest-projects/update/${id}`, {
+                      method: "PUT",
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: formData,
+                    });
+              
+                    const result = await response.json();
+                    if (response.ok) {
+                      Swal.fire({
+                        icon: "success",
+                        title: "Project Updated!",
+                        toast: true,
+                        position: "top-end",
+                        showConfirmButton: false,
+                        timer: 2000
+                      });
+                      closeEditModal();
+                      fetchProjects();
+                    } else {
+                      Swal.fire({
+                        icon: "error",
+                        title: "Update Error",
+                        text: result.message,
+                      });
+                    }
+                  } catch (err) {
+                    console.error("Update error:", err);
+                    Swal.fire({
+                      icon: "error",
+                      title: "Error",
+                      text: "An error occurred.",
+                    });
+                  }
+                });
+              
+                // Load projects on page load
+                window.addEventListener("DOMContentLoaded", fetchProjects);
+              </script>
+              
+            </div>
+
+            <!-- Blog Tab Content -->
+            <div class="tab-pane" id="blog-tab">
+              <h3 class="text-primary mb-4 text-center">Latest Blogs</h3>
+
+              <!-- Blog Upload Form -->
+              <form
+                id="blog-upload-form"
+                class="form-container "
+                style="
+                  max-width: 600px;
+                  margin: auto;
+                  padding: 20px;
+                  margin-bottom: 4rem;
+                  border-radius: 8px;
+                  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                  background-color: #f9f9f9;
+                "
+              >
+                <div class="mb-3">
+                  <label
+                    for="blog-name"
+                    class="form-label"
+                    style="font-weight: bold"
+                    >Blog Name</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="blog-name"
+                    placeholder="Enter blog name"
+                    required
+                  />
+                </div>
+
+                <div class="mb-3">
+                  <label
+                    for="blog-date"
+                    class="form-label"
+                    style="font-weight: bold"
+                    >Blog Date</label
+                  >
+                  <input
+                    type="date"
+                    id="blog-date"
+                    class="form-control"
+                    
+                    required
+                  />
+                </div>
+
+                <div class="mb-3">
+                  <label
+                    for="blog-content"
+                    class="form-label"
+                    style="font-weight: bold"
+                    >Blog Content</label
+                  >
+                  <textarea
+                    class="form-control"
+                    id="blog-content"
+                    rows="4"
+                    placeholder="Enter blog content"
+                    required
+                  ></textarea>
+                </div>
+
+                <div class="mb-3">
+                  <label
+                    for="blog-image-upload"
+                    class="form-label"
+                    style="font-weight: bold"
+                    >Upload Blog Image</label
+                  >
+                  <input
+                    type="file"
+                    class="form-control"
+                    id="blog-image-upload"
+                    accept="image/*"
+                    required
+                  />
+                </div>
+
+                <div id="blog-image-preview" class="mt-3 text-center">
+                  <img
+                    id="blog-selected-image"
+                    src=""
+                    alt="Selected Image"
+                    class="img-fluid"
+                    style="max-width: 300px; display: none"
+                  />
+                </div>
+
+                <div class="mt-4 text-center">
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+              </form>
+
+              <!-- All Blogs List -->
+                <h4 class="text-primary mb-3 text-center fw-bold" style="font-size: 1.3rem;">
+                All Blogs
+                </h4>
+                <div
+                class="h-[400px] overflow-y-scroll overflow-x-hidden border-2 border-gray-300 rounded-xl p-4 bg-gray-100"
+                >
+                <div id="blog-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-2 sm:px-4 w-full  mx-auto">
+                  <!-- Cards will be added dynamically inside here -->
+                </div>
+                
+                
+                </div>
+
+              <!-- Blog Management Script -->
+              <script>
+                const API_BASE_URL = "http://localhost:5000/api/blogs";
+                const blogForm = document.getElementById("blog-upload-form");
+                const previewImg = document.getElementById("blog-selected-image");
+              
+                // Image preview on file select
+                document
+                  .getElementById("blog-image-upload")
+                  .addEventListener("change", function (event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                      previewImg.src = URL.createObjectURL(file);
+                      previewImg.style.display = "block";
+                    }
+                  });
+              
+                // Add blog
+                blogForm.addEventListener("submit", async function (e) {
+                  e.preventDefault();
+                  const formData = new FormData();
+                  formData.append("title", document.getElementById("blog-name").value);
+                  formData.append("content", document.getElementById("blog-content").value);
+                  formData.append("date", document.getElementById("blog-date").value);
+                  formData.append(
+                    "image",
+                    document.getElementById("blog-image-upload").files[0]
+                  );
+              
+                  const token = localStorage.getItem("token");
+              
+                  try {
+                    const response = await fetch(`${API_BASE_URL}/add`, {
+                      method: "POST",
+                      headers: { Authorization: `Bearer ${token}` },
+                      body: formData,
+                    });
+              
+                    const result = await response.json();
+                    if (response.ok) {
+                      Swal.fire("Success", "Blog created successfully!", "success");
+                      blogForm.reset();
+                      previewImg.style.display = "none";
+                      fetchBlogs();
+                    } else {
+                      Swal.fire("Error", result.message, "error");
+                    }
+                  } catch (error) {
+                    Swal.fire("Error", "An error occurred while creating the blog.", "error");
+                  }
+                });
+              
+                // Fetch all blogs
+                async function fetchBlogs() {
+                  const token = localStorage.getItem("token");
+                  try {
+                    const response = await fetch(`${API_BASE_URL}/all`, {
+                      method: "GET",
+                      headers: { Authorization: `Bearer ${token}` },
+                    });
+              
+                    const blogs = await response.json();
+                    const blogContainer = document.getElementById("blog-container");
+                    blogContainer.innerHTML = "";
+              
+                    blogs.forEach((blog) => {
+                      const blogCard = `
+                        <div class="card mb-3">
+                          <img src="${blog.image}" class="card-img-top" alt="${blog.title}" style="max-height: 200px; object-fit: cover; padding: 10px; border-radius: 6px;">
+                          <div class="card-body">
+                            <h5 class="card-title">${blog.title}</h5>
+                            <p class="card-text">${blog.content.slice(0, 100)}...</p>
+<p class="card-text"><small class="text-muted">Published on ${new Date(blog.date).toLocaleDateString()}</small></p>
+                            <button class="btn btn-danger me-2" onclick="deleteBlog('${blog.id}')">Delete</button>
+                            <button class="btn btn-secondary" onclick="editBlog('${blog.id}', '${blog.title}', '${blog.content.replace(/'/g, "&#39;").replace(/"/g, "&quot;")}', '${blog.date}', '${blog.image}')">Edit</button>
+                          </div>
+                        </div>
+                      `;
+                      blogContainer.innerHTML += blogCard;
+                    });
+                  } catch (error) {
+                    Swal.fire("Error", "Failed to fetch blogs.", "error");
+                  }
+                }
+              
+                // Delete blog
+                async function deleteBlog(blogId) {
+  const confirmation = await Swal.fire({
+    title: "Are you sure?",
+    text: "This will permanently delete the blog!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete it!",
+  });
+
+  if (!confirmation.isConfirmed) return;
+
+  const token = localStorage.getItem("token");
+ toggleSpinner(true);
+  try {
+    const response = await fetch(`${API_BASE_URL}/delete/${blogId}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+      Swal.fire("Deleted!", "The blog has been deleted.", "success");
+      fetchBlogs(); // Refresh the blog list
+    } else {
+      Swal.fire("Error", result.message || "Delete failed", "error");
+    }
+  } catch (error) {
+    console.error("Delete error:", error);
+    Swal.fire("Error", "An error occurred while deleting the blog.", "error");
+  }
+}
+
+              
+                // Edit blog
+                function editBlog(id, title, content, date, image) {
+                  Swal.fire({
+                    title: "Update Blog",
+                    html: `
+                      <div style="display: flex; flex-direction: column; gap: 12px; text-align: left;">
+                        <label style="font-weight: 600;">Blog Title</label>
+                        <input id="swal-blog-title" class="swal2-input" placeholder="Title" value="${title}" style="margin-bottom: 0;">
+                        
+                        <label style="font-weight: 600;">Content</label>
+                        <textarea id="swal-blog-content" class="swal2-textarea" placeholder="Content" style="margin-bottom: 0;">${content}</textarea>
+                        
+                        <label style="font-weight: 600;">Date</label>
+                        <input type="date" id="swal-blog-date" class="swal2-input" value="${date.slice(0, 10)}" style="margin-bottom: 0;">
+                        
+                        <label style="font-weight: 600;">Current Image</label>
+                        <img src="${image}" alt="Current Image" style="max-width: 100%; height: auto; border-radius: 6px; margin-bottom: 0;">
+                        
+                        <label style="font-weight: 600;">Change Image (optional)</label>
+                        <button id="choose-image-btn" type="button" class="swal2-confirm swal2-styled" style="background-color: #6c757d; margin-top: 4px;">Choose New Image</button>
+                        <input type="file" id="swal-blog-image" accept="image/*" style="display: none;">
+                        <span id="image-file-name" style="display: block; font-size: 0.85rem;"></span>
+                      </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: "Update",
+                    didOpen: () => {
+                      const fileInput = document.getElementById("swal-blog-image");
+                      const chooseBtn = document.getElementById("choose-image-btn");
+                      const fileNameSpan = document.getElementById("image-file-name");
+              
+                      chooseBtn.addEventListener("click", () => {
+                        fileInput.click();
+                      });
+              
+                      fileInput.addEventListener("change", () => {
+                        fileNameSpan.textContent = fileInput.files[0]?.name || "";
+                      });
+                    },
+                    preConfirm: () => {
+                      return {
+                        title: document.getElementById("swal-blog-title").value,
+                        content: document.getElementById("swal-blog-content").value,
+                        date: document.getElementById("swal-blog-date").value,
+                        imageFile: document.getElementById("swal-blog-image").files[0] || null,
+                      };
+                    },
+                  }).then(async (result) => {
+                    if (result.isConfirmed) {
+                      const token = localStorage.getItem("token");
+                      const formData = new FormData();
+                      formData.append("title", result.value.title);
+                      formData.append("content", result.value.content);
+                      formData.append("date", result.value.date);
+                      if (result.value.imageFile) {
+                        formData.append("image", result.value.imageFile);
+                      }
+              
+                      try {
+                        const response = await fetch(`${API_BASE_URL}/update/${id}`, {
+                          method: "PUT",
+                          headers: { Authorization: `Bearer ${token}` },
+                          body: formData,
+                        });
+              
+                        const data = await response.json();
+                        if (response.ok) {
+                          Swal.fire("Updated", "Blog updated successfully!", "success");
+                          fetchBlogs();
+                        } else {
+                          Swal.fire("Error", data.message, "error");
+                        }
+                      } catch (error) {
+                        Swal.fire("Error", "An error occurred while updating the blog.", "error");
+                      }
+                    }
+                  });
+                }
+              
+                window.addEventListener("DOMContentLoaded", fetchBlogs);
+              </script>
+              
+            </div>
+
+            <!-- Gallery Tab -->
+
+            <div class="tab-pane p-6" id="gallery-tab">
+              <h3 class="text-blue-600 mb-6 text-center text-2xl font-semibold">
+                Image Gallery
+              </h3>
+
+              <!-- Gallery Form -->
+              <form
+                id="gallery-form"
+                class="max-w-xl mx-auto bg-white shadow-md rounded-lg p-6 space-y-4"
+                enctype="multipart/form-data"
+              >
+                <div>
+                  <label
+                    for="title"
+                    class="block text-sm font-medium text-gray-700"
+                    >Gallery Name</label
+                  >
+                  <input
+                    type="text"
+                    id="title"
+                    required
+                    class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    for="content"
+                    class="block text-sm font-medium text-gray-700"
+                    >Description</label
+                  >
+                  <textarea
+                    id="content"
+                    required
+                    class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
+                  ></textarea>
+                </div>
+
+                <div>
+                  <label
+                    for="image"
+                    class="block text-sm font-medium text-gray-700"
+                    >Upload Image</label
+                  >
+                  <input
+                    type="file"
+                    id="image"
+                    accept="image/*"
+                    required
+                    class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <img
+                    id="image-preview"
+                    class="mt-3 max-h-40 hidden rounded shadow"
+                  />
+                </div>
+
+                <div class="flex items-center justify-center">
+                  <button
+                    type="submit"
+                    class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition duration-150 font-semibold flex items-center gap-2"
+                  >
+                    <svg
+                      id="spinner"
+                      class="hidden animate-spin h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        class="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        stroke-width="4"
+                      ></circle>
+                      <path
+                        class="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 11-8 8z"
+                      ></path>
+                    </svg>
+                    <span id="submit-text">Submit</span>
+                  </button>
+                </div>
+              </form>
+
+              <!-- Gallery Display -->
+              <div class="mt-10">
+                <h4 class="text-center text-blue-600 text-xl font-medium mb-4">
+                  Gallery
+                </h4>
+                <div
+                  id="galleries"
+                  class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 px-4"
+                ></div>
+              </div>
+
+              <script>
+                const API_URL = "http://localhost:5000/api/gallery";
+                const apitoken = localStorage.getItem("token");
+
+                // Toast Notification
+                function showToast(message, success = true) {
+                  Swal.fire({
+                    toast: true,
+                    position: "top-end",
+                    icon: success ? "success" : "error",
+                    title: message,
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                  });
+                }
+
+                // Spinner Control
+                function toggleSpinner(show) {
+                  const spinner = document.getElementById("spinner");
+                  spinner.style.display = show ? "block" : "none";
+                }
+
+                // Fetch All Galleries
+                const getGalleries = async () => {
+                  toggleSpinner(true);
+                  try {
+                    const res = await fetch(`${API_URL}/all`, {
+                      headers: { Authorization: `Bearer ${apitoken}` },
+                    });
+                    const data = await res.json();
+                    const container = document.getElementById("galleries");
+                    container.innerHTML = "";
+
+                    data.forEach((item) => {
+                      const card = document.createElement("div");
+                      card.innerHTML = `
+                        <div class="bg-white shadow rounded-lg p-4">
+                          <img src="${item.image}" alt="${item.title}" class="w-full h-40 object-cover rounded mb-2">
+                          <h3 class="font-semibold text-lg">${item.title}</h3>
+                          <p class="text-gray-600 text-sm">${item.content}</p>
+                          <div class="mt-3 flex justify-between">
+                            <button onclick="editGallery(${item.id})" class="text-blue-600 text-sm hover:underline">Edit</button>
+                            <button onclick="deleteGallery(${item.id})" class="text-red-600 text-sm hover:underline">Delete</button>
+                          </div>
+                        </div>`;
+                      container.appendChild(card);
+                    });
+                  } catch (err) {
+                    console.error("Fetch error:", err);
+                    showToast("Failed to load galleries", false);
+                  } finally {
+                    toggleSpinner(false);
+                  }
+                };
+
+                // Submit Form - Create Gallery
+                const createGallery = async (e) => {
+                  e.preventDefault();
+                  const title = document.getElementById("title").value;
+                  const content = document.getElementById("content").value;
+                  const image = document.getElementById("image").files[0];
+
+                  if (!title || !content || !image) {
+                    showToast("All fields are required", false);
+                    return;
+                  }
+
+                  const formData = new FormData();
+                  formData.append("title", title);
+                  formData.append("content", content);
+                  formData.append("image", image);
+
+                  toggleSpinner(true);
+                  try {
+                    const res = await fetch(`${API_URL}/add`, {
+                      method: "POST",
+                      headers: {
+                        Authorization: `Bearer ${apitoken}`,
+                      },
+                      body: formData,
+                    });
+
+                    const result = await res.json();
+                    if (res.ok) {
+                      showToast("Gallery added successfully");
+                      document.getElementById("gallery-form").reset();
+                      getGalleries();
+                    } else {
+                      showToast(result.message || "Upload failed", false);
+                    }
+                  } catch (err) {
+                    console.error("Upload error:", err);
+                    showToast("Upload failed", false);
+                  } finally {
+                    toggleSpinner(false);
+                  }
+                };
+
+                // Edit Gallery
+                const editGallery = async (id) => {
+                  // Fetch existing data
+                  let existing;
+                  try {
+                    const res = await fetch(`${API_URL}/${id}`, {
+                      headers: { Authorization: `Bearer ${apitoken}` },
+                    });
+                    existing = await res.json();
+                    if (!res.ok) throw new Error(existing.message);
+                  } catch (err) {
+                    showToast("Failed to load gallery data", false);
+                    return;
+                  }
+
+                  const { title, content, image } = existing;
+
+                  const { value: formValues } = await Swal.fire({
+                    title: "✏️ Edit Gallery",
+                    html: `
+      <div style="display: flex; flex-direction: column; gap: 10px; text-align: left">
+        <label style="font-weight: 600;">Project Name</label>
+        <input id="swal-title" class="swal2-input" placeholder="Title" value="${title}">
+
+        <label style="font-weight: 600;">Description</label>
+        <textarea id="swal-content" class="swal2-textarea" placeholder="Content">${content}</textarea>
+
+        <label style="font-weight: 600;">Current Image</label>
+        <img src="${image}" alt="Preview" style="max-height: 100px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 6px">
+
+        <label style="font-weight: 600;">Change Image (optional)</label>
+        <input type="file" id="swal-image" accept="image/*" class="swal2-file" />
+      </div>
+    `,
+                    customClass: {
+                      popup: "swal2-gallery-edit",
+                    },
+                    focusConfirm: false,
+                    showCancelButton: true,
+                    confirmButtonText: "✅ Update",
+                    cancelButtonText: "❌ Cancel",
+                    preConfirm: () => {
+                      const updatedTitle =
+                        document.getElementById("swal-title").value;
+                      const updatedContent =
+                        document.getElementById("swal-content").value;
+                      const updatedImage =
+                        document.getElementById("swal-image").files[0];
+
+                      if (!updatedTitle || !updatedContent) {
+                        Swal.showValidationMessage(
+                          "Both title and content are required"
+                        );
+                      }
+
+                      return { updatedTitle, updatedContent, updatedImage };
+                    },
+                  });
+
+                  if (!formValues) return;
+
+                  const formData = new FormData();
+                  formData.append("title", formValues.updatedTitle);
+                  formData.append("content", formValues.updatedContent);
+                  if (formValues.updatedImage) {
+                    formData.append("image", formValues.updatedImage);
+                  }
+
+                  toggleSpinner(true);
+                  try {
+                    const res = await fetch(`${API_URL}/update/${id}`, {
+                      method: "PUT",
+                      headers: { Authorization: `Bearer ${apitoken}` },
+                      body: formData,
+                    });
+
+                    const result = await res.json();
+                    if (res.ok) {
+                      showToast("Gallery updated");
+                      getGalleries();
+                    } else {
+                      showToast(result.message || "Update failed", false);
+                    }
+                  } catch (err) {
+                    console.error("Update error:", err);
+                    showToast("Update failed", false);
+                  } finally {
+                    toggleSpinner(false);
+                  }
+                };
+
+                // Delete Gallery
+                const deleteGallery = async (id) => {
+                  const confirmation = await Swal.fire({
+                    title: "Are you sure?",
+                    text: "This will permanently delete the gallery!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, delete it!",
+                  });
+
+                  if (!confirmation.isConfirmed) return;
+
+                  toggleSpinner(true);
+                  try {
+                    const res = await fetch(`${API_URL}/delete/${id}`, {
+                      method: "DELETE",
+                      headers: { Authorization: `Bearer ${apitoken}` },
+                    });
+
+                    const result = await res.json();
+                    if (res.ok) {
+                      showToast("Deleted successfully");
+                      getGalleries();
+                    } else {
+                      showToast(result.message || "Delete failed", false);
+                    }
+                  } catch (err) {
+                    console.error("Delete error:", err);
+                    showToast("Delete failed", false);
+                  } finally {
+                    toggleSpinner(false);
+                  }
+                };
+
+                // Initialize
+                window.onload = getGalleries;
+                document
+                  .getElementById("gallery-form")
+                  .addEventListener("submit", createGallery);
+              </script>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      const menuToggle = document.getElementById("menu-toggle");
+      const wrapper = document.getElementById("wrapper");
+      const sidebar = document.getElementById("sidebar-wrapper");
+      const pageContent = document.getElementById("page-content-wrapper");
+
+      menuToggle.addEventListener("click", () => {
+        wrapper.classList.toggle("toggled");
+        sidebar.classList.toggle("visible");
+        pageContent.classList.toggle("shifted");
+      });
+
+      // Tab switching functionality
+      document
+        .getElementById("dashboard-link")
+        .addEventListener("click", () => {
+          showTab("dashboard-tab");
+        });
+
+      document.getElementById("projects-link").addEventListener("click", () => {
+        showTab("projects-tab");
+      });
+
+      document.getElementById("blog-link").addEventListener("click", () => {
+        showTab("blog-tab");
+      });
+
+      document.getElementById("gallery-link").addEventListener("click", () => {
+        showTab("gallery-tab");
+      });
+
+      function showTab(tabId) {
+        // Hide all tabs
+        const tabs = document.querySelectorAll(".tab-pane");
+        tabs.forEach((tab) => tab.classList.remove("active"));
+
+        // Show the selected tab
+        document.getElementById(tabId).classList.add("active");
+      }
+
+      // Show Dashboard tab by default on page load
+      window.addEventListener("load", () => {
+        showTab("dashboard-tab");
+      });
+    </script>
+
+    <!-- gallery -->
+    <!-- <script>
+      // Handle Image Upload and Preview
+      document
+        .getElementById("image-upload-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          const imageInput = document.getElementById("image-upload");
+          const imageFile = imageInput.files[0];
+          const reader = new FileReader();
+
+          reader.onload = function () {
+            const imageUrl = reader.result;
+            const galleryImagesContainer =
+              document.getElementById("gallery-images");
+
+            // Create new image element
+            const newImageDiv = document.createElement("div");
+            newImageDiv.classList.add("col-md-4", "mb-4");
+            newImageDiv.innerHTML = `<div class="image-container" style="text-align: center; position: relative;">
+          <img src="${imageUrl}" class="img-fluid" style="border-radius: 8px; max-height: 250px; object-fit: cover;">
+        </div>`;
+
+            // Append to gallery
+            galleryImagesContainer.appendChild(newImageDiv);
+
+            // Reset the form
+            document.getElementById("image-upload-form").reset();
+          };
+
+          if (imageFile) {
+            reader.readAsDataURL(imageFile);
+          }
+        });
+    </script> -->
+
+    <!-- blog -->
+
+    <script>
+      // Image Preview functionality
+      document
+        .getElementById("image-upload")
+        .addEventListener("change", function (event) {
+          const reader = new FileReader();
+          reader.onload = function () {
+            const imagePreview = document.getElementById("selected-image");
+            imagePreview.src = reader.result;
+            imagePreview.style.display = "block";
+          };
+          reader.readAsDataURL(event.target.files[0]);
+        });
+
+      // Form submission handling (optional)
+      document
+        .getElementById("image-upload-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          const projectName = document.getElementById("project-name").value;
+          const projectDate = document.getElementById("project-date").value;
+          const projectContent =
+            document.getElementById("project-content").value;
+
+          alert(
+            `Project Name: ${projectName}\nProject Date: ${projectDate}\nProject Content: ${projectContent}`
+          );
+          // You can handle the form submission here (e.g., send the data to a server)
+        });
+    </script>
+
+    <!-- latest project -->
+
+    <script>
+      // Handle image preview when selecting a file
+      document
+        .getElementById("image-upload")
+        .addEventListener("change", function (event) {
+          const file = event.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              const image = document.getElementById("selected-image");
+              image.src = e.target.result;
+              image.style.display = "block"; // Show the image
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+
+      // Handle form submission
+      document
+        .getElementById("image-upload-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault(); // Stop page reload
+
+          const projectName = document.getElementById("project-name").value;
+          const imageSrc = document.getElementById("selected-image").src;
+
+          if (projectName && imageSrc) {
+            const cardContainer = document.getElementById("project-cards");
+
+            // Create new card div
+            const cardWrapper = document.createElement("div");
+            cardWrapper.className = "col-lg-3 col-md-4 col-sm-6 mb-4"; // 4 card in large, 3 in medium, 2 in small
+
+            const card = document.createElement("div");
+            card.className = "card h-100"; // Card full height inside
+            card.style.borderRadius = "10px";
+            card.innerHTML = `
+  <img src="${imageSrc}" class="card-img-top" alt="${projectName}" style="border-top-left-radius:10px;border-top-right-radius:10px; height:200px; object-fit:cover;">
+  <div class="card-body text-center">
+    <h5 class="card-title">${projectName}</h5>
+    <button class="btn btn-warning btn-sm edit-btn" style="margin-right:10px;">Edit</button>
+    <button class="btn btn-danger btn-sm delete-btn">Delete</button>
+  </div>
+`;
+
+            cardWrapper.appendChild(card);
+            cardContainer.appendChild(cardWrapper);
+
+            // Delete functionality
+            card
+              .querySelector(".delete-btn")
+              .addEventListener("click", function () {
+                cardWrapper.remove();
+              });
+
+            // Edit functionality
+            card
+              .querySelector(".edit-btn")
+              .addEventListener("click", function () {
+                document.getElementById("project-name").value = projectName;
+                document.getElementById("selected-image").src = imageSrc;
+                document.getElementById("selected-image").style.display =
+                  "block";
+                cardWrapper.remove();
+              });
+
+            // Edit functionality
+            card
+              .querySelector(".edit-btn")
+              .addEventListener("click", function () {
+                document.getElementById("project-name").value = projectName;
+                document.getElementById("selected-image").src = imageSrc;
+                document.getElementById("selected-image").style.display =
+                  "block";
+                card.remove();
+              });
+          }
+        });
+    </script>
+  </body>
+</html>

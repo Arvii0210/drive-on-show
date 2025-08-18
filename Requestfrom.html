@@ -1,33 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-  <link rel="stylesheet" href="/Style.css">
+  <title>Request Quote</title>
+  <link rel="stylesheet" href="Requesfrom.css">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-
-
-
-
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 </head>
-
-
-
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
 <body>
 
 
 
-  <!-- Navbar -->
-  <header class="shadow-md tracking-wide relative z-50">
+
+<!-- navbar -->
+
+ <header class="shadow-md tracking-wide relative z-50">
     <section class="py-2 bg-[#252525] text-white px-4 sm:px-10">
       <div class="flex flex-col sm:flex-row items-center sm:justify-between text-center sm:text-left gap-2">
         <p class="text-sm">
@@ -229,224 +222,221 @@
   </header>
 
 
- 
 
 
-
-  <!-- hero -->
-
-  <section class="hero">
-    <div class="hero-overlay">
-      <div class="hero-content">
-        <h1>Welcome to Keerthi & Keerthi Fabs</h1>
-        <p> Keerthi & Keerthi Fabs, established in 1980 in Coimbatore, is a leading manufacturer of stainless
-          fabrications and custom railings, known for quality, precision, and durability.
-        </p>
-        <button> <a href="/Requestfrom.html">REQUEST A QUOTE NOW </a></button>
-      </div>
-    </div>
-  </section>
-
-
-
-  <!-- <section class="hero">
-  <div class="hero-overlay">
-    <div class="hero-content">
-      <h1>Welcome to Keerthi’s World</h1>
-      <p>We build what you dream — Websites | Designs | Solutions</p>
-      <button>Explore Now</button>
-
-      <div class="carousel-container swiper">
-        <div class="swiper-wrapper">
-          <div class="swiper-slide"><img src="/photos/g-pipe-1.jpg" alt="Slide 1" /></div>
-          <div class="swiper-slide"><img src="/photos/g-pipe-2.jpg" alt="Slide 2" /></div>
-          <div class="swiper-slide"><img src="/photos/g-pipe-3.jpg" alt="Slide 3" /></div>
+      <div class="quote-form-container">
+        <div class="header-flex">
+          <h2 class="Request">Request a Quote</h2>
+          <img class="logo" src="/photos/keerthi-logo.png" alt="Keerthi Logo">
         </div>
+        <!-- ... your form continues ... -->
+   
+      
+        <form id="enquiry-form" action="#" method="POST" enctype="multipart/form-data">
+          <!-- Name Fields -->
+          <div class="form-group">
+            <label for="name"> Name*</label>
+            <input type="text" id="name" name="Name" class="form-control" required>
+          </div>
+          <!-- <div class="form-group">
+            <label for="last-name">Last Name*</label>
+            <input type="text" id="last-name" name="last-name" class="form-control" required>
+          </div> -->
+       <!-- Phone Field -->
+       <div class="form-group">
+        <label for="phone">Phone*</label>
+        <input type="tel" id="phone" name="phone" class="form-control" required>
       </div>
-    </div>
+          <!-- Email Field -->
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" class="form-control" required>
+          </div>
+      
+         
+      
+          <!-- Delivery and Installation -->
+          <div class="form-group">
+            <label for="delivery-installation">Does Your Project Require Delivery and/or Installation?*</label>
+            <select id="delivery-installation" name="delivery-installation" class="form-control">
+              <option value="no">No</option>
+              <option value="yes">Yes</option>
+              <option value="NotSure">Not Sure</option>
+            </select>
+          </div>
+      
+          <!-- Measurements Required -->
+          <div class="form-group">
+            <label for="measurements">Does Your Project Require Us to Come to You to Take Measurements?*</label>
+            <select id="measurements" name="measurements" class="form-control">
+              <option value="no">No</option>
+              <option value="yes">Yes</option>
+              <option value="NotSure">Not Sure</option>
+            </select>
+          </div>
+      
+          <!-- Type of Project -->
+          <div class="form-group">
+            <label for="project-type">Type of Project*</label>
+            <select id="project-type" name="project-type" class="form-control" required>
+              <option value="stairs">Stairs</option>
+              <option value="railings">Railings</option>
+              <option value="gates">Gates</option>
+              <option value="furnishings">Furnishings</option>
+              <option value="custom-metal">Custom Metal Work</option>
+            </select>
+          </div>
+      
+          <!-- Delivery and Installation Options -->
+          <div class="form-group">
+            <label for="delivery-options">Delivery and Installation options</label>
+            <select id="delivery-options" name="delivery-options" class="form-control">
+              <option value="delivery-install">Delivery and Install</option>
+              <option value="delivery-only">Delivery only (must have way to unload)</option>
+            </select>
+          </div>
+      
+          <!-- Project Description -->
+          <div class="form-group">
+            <label for="project-description">Brief Description of Project</label>
+            <textarea id="project-description" name="project-description" class="form-control" rows="4"></textarea>
+          </div>
+      
+          <!-- Requested Delivery Date -->
+          <div class="form-group">
+            <label for="requested-delivery">Requested Delivery Date</label>
+            <input type="date" id="requested-delivery" name="requested-delivery" class="form-control">
+          </div>
+      
+          <!-- Approximate Budget -->
+          <div class="form-group">
+            <label for="budget">Approximate Budget*</label>
+            <select id="budget" name="budget" class="form-control" required>
+              <option value="₹5000-or-less">₹5,000 or less</option>
+              <option value="₹5000-10000">₹5,000 - ₹10,000</option>
+              <option value="₹10000-or-more">₹10,000 or more</option>
+            </select>
+          </div>
+      
+          <!-- Desired Material -->
+          <div class="form-group">
+            <label for="material">Desired Material</label>
+            <select id="material" name="material" class="form-control">
+              <option value="steel">Steel</option>
+              <option value="Wrought-iron">Wrought iron</option>
+              <option value="Stainless-steel">Stainless steel</option>
+              <option value="Aluminum">Aluminum</option>
+              <option value="Notsure">Not sure</option>
+            </select>
+          </div>
+      
+          <!-- Coating -->
+          <div class="form-group">
+            <label for="coating">Coating</label>
+            <select id="coating" name="coating" class="form-control">
+              <option value="powder-coating">Powder Coating</option>
+              <option value="Clear-coating">Clear coating</option>
+              <option value="Painting">Painting</option>
+              <option value="Galvanizing">Galvanizing</option>
+              <option value="Notsure">Not sure</option>
+            </select>
+          </div>
+      
+          <!-- Submit Button -->
+<button class="bg-blue-900 text-white py-3 px-6 text-lg font-semibold rounded-lg transition-all duration-300 ease-in-out transform hover:bg-blue-500 hover:shadow-lg active:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" type="submit">
+  Submit Request
+</button>
+        </form>
+      
+        <!-- Spinner (hidden by default) -->
+        <div id="spinner" style="display: none; text-align: center;">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      
+        <!-- Toast Notifications -->
+        <div id="toast" class="toast" style="position: fixed; top: 20px; right: 20px; z-index: 1050; display: none;">
+          <div class="toast-body" id="toast-message">
+            <!-- Message will go here -->
+          </div>
+        </div>
+      
+      
+      <script>
+        // Form submission handler
+        document.getElementById('enquiry-form').addEventListener('submit', async function (e) {
+          e.preventDefault(); // Prevent default form submission
+      
+          const formData = {
+            Name: document.getElementById("name").value,
+            email: document.getElementById("email").value,
+            phone: document.getElementById("phone").value,
+            deliveryInstallation: document.getElementById("delivery-installation").value,
+            measurements: document.getElementById("measurements").value,
+            projectType: document.getElementById("project-type").value,
+            deliveryOptions: document.getElementById("delivery-options").value,
+            projectDescription: document.getElementById("project-description").value,
+            requestedDelivery: document.getElementById("requested-delivery").value,
+            budget: document.getElementById("budget").value,
+            material: document.getElementById("material").value,
+            coating: document.getElementById("coating").value,
+          };
+      
+          // Show spinner while waiting for the response
+          document.getElementById("spinner").style.display = "block";
+      
+          try {
+            const response = await fetch("http://localhost:5000/api/contact/enquiry", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify(formData)
+            });
+      
+            const data = await response.json();
+      
+            // Hide spinner after submission
+            document.getElementById("spinner").style.display = "none";
+      
+            if (response.ok) {
+              // Show success toast
+              showToast("Enquiry submitted successfully!", "success");
+      
+              // Reset the form
+              document.getElementById('enquiry-form').reset();
+            } else {
+              // Show error toast
+              showToast("Error: " + data.message, "error");
+            }
+          } catch (error) {
+            // Hide spinner in case of error
+            document.getElementById("spinner").style.display = "none";
+            console.error("Request failed", error);
+            showToast("Something went wrong. Please try again later.", "error");
+          }
+        });
+      
+        // Toast Notification Function
+        function showToast(message, type) {
+          const toast = document.getElementById("toast");
+          const toastMessage = document.getElementById("toast-message");
+      
+          toastMessage.textContent = message;
+          toast.className = "toast show";
+          
+          // Set background color based on success/error
+          toast.style.backgroundColor = type === "success" ? "#28a745" : "#dc3545"; 
+      
+          // Hide the toast after 3 seconds
+          setTimeout(() => {
+            toast.classList.remove("show");
+          }, 3000);
+        }
+      </script>
   </div>
-</section> -->
-
-
-
-
-  <!--what-we-do  -->
-  <section class="what-we-do">
-    <h2>What we do</h2>
-    <div class="card-container">
-      <div class="card">
-        <img src="/photos/balcony1.jpg" alt="Outdoor Spiral Stairs">
-        <div class="overlay-text">Balcony Glasswork</div>
-      </div>
-      <div class="card">
-        <img src="/photos/Charupudi-1.jpg" alt="Steel Spiral Stairs">
-        <div class="overlay-text">Charupudi</div>
-      </div>
-      <div class="card">
-        <img src="/photos/ss-gate-2.jpg" alt="Curved Stairs">
-        <div class="overlay-text">SS Gate</div>
-      </div>
-      <div class="card">
-        <img src="/photos/g-pipe-1.jpg" alt="Outdoor Spiral Stairs">
-        <div class="overlay-text">G Pipe With Glass</div>
-      </div>
-      <div class="card">
-        <img src="/photos/ms-gate-3.jpg" alt="Steel Spiral Stairs">
-        <div class="overlay-text">M S Gate</div>
-      </div>
-      <div class="card">
-        <img src="/photos/safety-door-work-7.jpg" alt="Curved Stairs">
-        <div class="overlay-text">Safety Door Work</div>
-      </div>
-      <div class="card">
-        <img src="/photos/ss-handrail-4.jpg" alt="Outdoor Spiral Stairs">
-        <div class="overlay-text">SS Handrail work</div>
-      </div>
-      <div class="card">
-        <img src="/photos/woodrail-9.jpg" alt="Steel Spiral Stairs">
-        <div class="overlay-text">Wooden Glass Railing</div>
-      </div>
-
-    </div>
-  </section>
-
-
-
-  <!-- how-we-do-it -->
-  <!-- HTML -->
-  <section class="how-we-do-modern">
-    <div class="how-container">
-      <div class="how-heading">
-        <h2>How We Work</h2>
-        <p>Crafting excellence through every step</p>
-      </div>
-      <div class="how-steps">
-        <div class="how-card">
-          <div class="how-icon">1</div>
-          <h3>Consultation</h3>
-          <p>Understanding your exact needs and vision before starting anything.</p>
-        </div>
-        <div class="how-card">
-          <div class="how-icon">2</div>
-          <h3>Custom Design</h3>
-          <p>Designing products that blend strength and style to match your space.</p>
-        </div>
-        <div class="how-card">
-          <div class="how-icon">3</div>
-          <h3>Fabrication</h3>
-          <p>Precision-built using high-quality materials and skilled hands.</p>
-        </div>
-        <div class="how-card">
-          <div class="how-icon">4</div>
-          <h3>Delivery & Install</h3>
-          <p>Timely delivery and flawless installation at your location.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-
-
-
-  <!-- latest-projects -->
-   <div style="background: linear-gradient(135deg, #d4d0cb88, #cfcfcf65);">
-  <section class="py-16 px-6 max-w-7xl mx-auto" >
-    <h2 class="text-4xl font-bold text-center text-slate-800 mb-12 tracking-tight">Latest Projects</h2>
-    <ul id="latest-projects" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10 xl:gap-12">
-      <!-- Template Item (Hidden) -->
-      <li
-        class="project-template hidden bg-white rounded-2xl shadow-xl overflow-hidden transition-transform transform hover:scale-[1.02]">
-        <img class="w-full h-56 object-cover project-image" src="" alt="Project Image">
-        <div class="p-6">
-          <h3 class="text-xl font-semibold text-slate-900 project-title mb-2"></h3>
-          <p class="text-sm text-gray-600 project-description leading-relaxed line-clamp-3"></p>
-        </div>
-      </li>
-    </ul>
-  </section>
-
-
-  <script src="script\viewproject.js"></script>
-
-
-</div>
-
-
-
-
-
-
-
-
-  <!-- testimonial-section -->
-  <section class="testimonial-section">
-    <div class="testimonial-header">
-      <!-- <h6>TESTIMONIALS</h6> -->
-      <h2>Our Customers</h2>
-      <p>Our customers’ voices echo honesty, trust, and loyalty — let’s never miss a beat.</p>
-      <div class="icon-line">
-        <hr><i class="fas fa-stairs"></i>
-        <hr>
-      </div>
-    </div>
-
-    <br>
-    <div class="testimonial-container">
-      <!-- Card 1 -->
-      <div class="testimonial-card">
-        <img src="/photos/person.png" alt="Dias V">
-        <div class="testimonial-info">
-          <p class="name">Dias V</p>
-          <p class="role">DOCTOR</p>
-          <p class="text">The quality of the building materials and the finishing is by far the best you can get &
-            everything got done on time.</p>
-        </div>
-      </div>
-
-      <!-- Card 2 -->
-      <div class="testimonial-card">
-        <img src="/photos/person.png" alt="Arun Jose">
-        <div class="testimonial-info">
-          <p class="name">Arun Jose</p>
-          <p class="role">SOFTWARE ENGINEER</p>
-          <p class="text">The team was always available to us to discuss fine details in spite of time limits. We loved
-            working with Keerthi-Fabs.</p>
-        </div>
-      </div>
-
-      <!-- Card 3 -->
-      <div class="testimonial-card">
-        <img src="/photos/person.png" alt="Roshan Krishna">
-        <div class="testimonial-info">
-          <p class="name">Roshan Krishna</p>
-          <p class="role">LAWYER</p>
-          <p class="text">We highly appreciate the team for the Handrail job completed within the time period with
-            perfection.</p>
-        </div>
-      </div>
-
-      <!-- Card 4 -->
-      <div class="testimonial-card">
-        <img src="/photos/person.png" alt="Priya R">
-        <div class="testimonial-info">
-          <p class="name">Priya R</p>
-          <p class="role">ARCHITECT</p>
-          <p class="text">Keerthi-Fabs delivered exactly what we envisioned. Their communication and professionalism
-            made the process stress-free.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-
-
-
-
-
-
-
-
-
+  
 
 
 
@@ -622,46 +612,24 @@
       </div>
     </footer>
   </section>
-
-
-  <!-- back to top -->
-  <a href="#" class="back-to-top" title="Back to Top">
-    <i class="fas fa-chevron-up"></i>
-  </a>
-
-
-
-  <!-- whatsapp -->
-  <a href="https://wa.me/919843031717" class="whatsapp-button" target="_blank" aria-label="Chat on WhatsApp">
-    <div class="wa-circle">
-      <img src="https://img.icons8.com/ios-filled/30/ffffff/whatsapp.png" alt="WhatsApp Icon" class="shake-icon">
-    </div>
-  </a>
-
-
-
-
-
-
-
 </body>
 
 <!-- navbar -->
 <script>
   var toggleOpen = document.getElementById('toggleOpen');
-  var toggleClose = document.getElementById('toggleClose');
-  var collapseMenu = document.getElementById('collapseMenu');
+var toggleClose = document.getElementById('toggleClose');
+var collapseMenu = document.getElementById('collapseMenu');
 
-  function handleClick() {
-    if (collapseMenu.style.display === 'block') {
-      collapseMenu.style.display = 'none';
-    } else {
-      collapseMenu.style.display = 'block';
-    }
-  }
+function handleClick() {
+if (collapseMenu.style.display === 'block') {
+  collapseMenu.style.display = 'none';
+} else {
+  collapseMenu.style.display = 'block';
+}
+}
 
-  toggleOpen.addEventListener('click', handleClick);
-  toggleClose.addEventListener('click', handleClick);
+toggleOpen.addEventListener('click', handleClick);
+toggleClose.addEventListener('click', handleClick);
 </script>
 
 
@@ -697,23 +665,4 @@
     }, 500); // same as animation duration
   });
 </script>
-
-
-
-
-<script src="/script/Script.js"></script>
-
-<!-- <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-<script>
-  const swiper = new Swiper(".swiper", {
-    loop: true,
-    autoplay: {
-      delay: 2000,
-      disableOnInteraction: false,
-    },
-    slidesPerView: 1,
-    spaceBetween: 20,
-  });
-</script> -->
-
 </html>

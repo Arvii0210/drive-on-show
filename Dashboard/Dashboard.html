@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Keerthi-Fab Admin Dashboard</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- Google Font Link -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- FontAwesome Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="/Dashboard/Dashboard.css">
+</head>
+
+
+<body>
+  <div class="d-flex" id="wrapper">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar-wrapper">
+      <div class="sidebar-heading text-center">
+        <img class="sidebar-logo" src="/photos/keerthi-logo.png" alt="Logo">
+        <span>Keerthi & Keerthi-Fab</span>
+      </div>
+
+      <div class="user-info text-center">
+        <h6 class="mb-0" style="font-size: 1.1rem; color: var(--text-dark)">Admin</h6>
+        <small class="text-muted" style="font-size: 0.9rem">Admin@example.com</small>
+      </div>
+
+      <div class="list-group list-group-flush">
+        <a href="#" class="list-group-item list-group-item-action active" id="dashboard-link">
+          <i class="fas fa-tachometer-alt fa-fw"></i> Dashboard
+        </a>
+        <a href="#" class="list-group-item list-group-item-action" id="projects-link">
+          <i class="fas fa-briefcase fa-fw"></i> Latest Projects
+        </a>
+        <a href="#" class="list-group-item list-group-item-action" id="gallery-link">
+          <i class="fas fa-images fa-fw"></i> Gallery
+        </a>
+      </div>
+      <div class="mt-auto p-3" style="display: flex;align-items: center;justify-content: center;">
+        <button id="logoutBtn" class="btn btn-danger w-100">
+          <i class="fas fa-sign-out-alt me-2"></i> Logout
+        </button>
+      </div>
+    </div>
+
+
+
+
+
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+
+
+
+
+      <nav class="navbar navbar-light bg-white shadow-sm">
+        <div class="container-fluid">
+          <button class="btn btn-outline-primary" id="menu-toggle">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h5 class="ms-3 my-0 fw-bold text-primary">Admin Dashboard</h5>
+        </div>
+      </nav>
+
+
+
+      <div class="container-fluid py-4">
+        <div class="tab-content" id="tab-content">
+
+          <!-- Dashboard Tab -->
+          <div class="tab-pane active" id="dashboard-tab">
+            <div class="row g-4">
+
+
+              <div class="col-lg-6 col-md-6 dashboard-tile">
+                <a href="#" id="projects-tile" class="text-decoration-none">
+                  <div class="glass-card text-center p-4">
+                    <div class="icon-circle icon-primary mx-auto">
+                      <i class="fas fa-briefcase"></i>
+                    </div>
+                    <h6>Total Projects</h6>
+                    <h3>3</h3>
+                  </div>
+                </a>
+              </div>
+
+
+              <div class="col-lg-6 col-md-6 dashboard-tile">
+                <a href="#" id="gallery-tile" class="text-decoration-none">
+                  <div class="glass-card text-center p-4">
+                    <div class="icon-circle icon-warning mx-auto">
+                      <i class="fas fa-images"></i>
+                    </div>
+                    <h6>Total Gallery </h6>
+                    <h3>5</h3>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Projects Tab -->
+          <div class="tab-pane" id="projects-tab">
+            <h4 class="text-primary mb-3" style="font-weight: 700">Latest Projects Management</h4>
+
+            <!-- Image Upload Form -->
+            <form id="image-upload-form" class="form-container">
+              <div class="row g-4 align-items-end">
+                <div class="col-md-6 col-lg-4">
+                  <label for="project-name" class="form-label">Project Name</label>
+                  <input type="text" class="form-control" id="project-name" required />
+                </div>
+                <div class="col-md-6 col-lg-4">
+                  <label for="project-location" class="form-label">Location</label>
+                  <input type="text" class="form-control" id="project-location" required />
+                </div>
+                <div class="col-md-12 col-lg-4">
+                  <label for="image-upload" class="form-label">Upload Project Image</label>
+                  <input type="file" class="form-control" id="image-upload" accept="image/*" required />
+                </div>
+                <div class="col-md-12">
+                  <label for="project-description" class="form-label">Description</label>
+                  <textarea class="form-control" id="project-description" rows="3" required></textarea>
+                </div>
+                <div id="image-preview" class="col-md-12 text-center mt-3" style="display: none;">
+                  <img id="selected-image" src="" alt="Selected Image" class="img-fluid"
+                    style="max-height: 150px; border-radius: 0.5rem; border: 1px solid var(--border-color);" />
+                </div>
+                <div class="col-md-12 text-center mt-4">
+                  <button type="submit" class="btn btn-primary w-md-50">
+                    <i class="fas fa-plus-circle me-2"></i>Add Project
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            <!-- Project Cards Container -->
+            <div id="project-cards-container">
+              <div id="project-cards" class="row g-4">
+                <!-- Cards will be dynamically inserted here -->
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Gallery Tab -->
+          <div class="tab-pane" id="gallery-tab">
+            <h4 class="text-primary mb-3" style="font-weight: 700">Image Gallery Management</h4>
+
+            <!-- Gallery Form -->
+            <form id="gallery-form" class="mx-auto" enctype="multipart/form-data">
+              <div class="row g-4">
+                <div class="col-12">
+                  <label for="title" class="form-label">Gallery Name</label>
+                  <input type="text" id="title" required class="form-control" />
+                </div>
+                <div class="col-12">
+                  <label for="content" class="form-label">Description</label>
+                  <textarea id="content" required class="form-control" rows="3"></textarea>
+                </div>
+                <div class="col-12">
+                  <label for="image" class="form-label">Upload Image</label>
+                  <input type="file" id="image" accept="image/*" required class="form-control" />
+                  <img id="image-preview" class="mt-3 rounded shadow-sm" style="max-height: 150px; display: none;" />
+                </div>
+                <div class="col-12 text-center">
+                  <button type="submit" class="btn btn-primary w-md-50">
+                    <svg id="spinner" class="animate-spin h-5 w-5 text-white me-2" style="display:none;"
+                      xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 11-8 8z">
+                      </path>
+                    </svg>
+                    <span id="submit-text">Submit to Gallery</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            <!-- Gallery Display -->
+            <div class="content-card mt-4">
+              <!-- <h4 class="text-center text-primary mb-4">Current Gallery</h4> -->
+              <div id="galleries" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+            </div>
+            <br><br>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Project Update Modal (Styled to match new UI) -->
+  <div id="edit-project-modal">
+    <h4 class="text-primary mb-4">Edit Project</h4>
+    <form id="edit-project-form">
+      <input type="hidden" id="edit-project-id">
+      <div class="mb-3">
+        <label for="edit-project-name" class="form-label">Project Name</label>
+        <input type="text" class="form-control" id="edit-project-name" required />
+      </div>
+      <div class="mb-3">
+        <label for="edit-project-location" class="form-label">Location</label>
+        <input type="text" class="form-control" id="edit-project-location" required />
+      </div>
+      <div class="mb-3">
+        <label for="edit-project-description" class="form-label">Description</label>
+        <textarea class="form-control" id="edit-project-description" rows="3" required></textarea>
+      </div>
+      <div class="mb-3">
+        <label for="edit-project-image" class="form-label">Upload New Image (Optional)</label>
+        <input type="file" class="form-control" id="edit-project-image" accept="image/*" />
+      </div>
+      <div class="d-flex justify-content-end gap-2 mt-4">
+        <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+    </form>
+  </div>
+  <div id="overlay"></div>
+
+
+  <!-- SCRIPTS (UNCHANGED) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Sidebar Toggle
+    const menuToggle = document.getElementById("menu-toggle");
+    const wrapper = document.getElementById("wrapper");
+    menuToggle.addEventListener("click", () => {
+      wrapper.classList.toggle("toggled");
+    });
+
+    // Tab Switching Logic
+    const links = document.querySelectorAll(".sidebar .list-group-item");
+    const tabs = document.querySelectorAll(".tab-pane");
+
+    function showTab(tabId) {
+      tabs.forEach(tab => tab.classList.remove("active"));
+      document.getElementById(tabId).classList.add("active");
+
+      links.forEach(link => link.classList.remove("active"));
+      document.getElementById(tabId.replace('-tab', '-link')).classList.add("active");
+    }
+
+    document.getElementById("dashboard-link").addEventListener("click", (e) => { e.preventDefault(); showTab("dashboard-tab"); });
+    document.getElementById("projects-link").addEventListener("click", (e) => { e.preventDefault(); showTab("projects-tab"); });
+    document.getElementById("gallery-link").addEventListener("click", (e) => { e.preventDefault(); showTab("gallery-tab"); });
+
+    // Dashboard tiles also switch tabs
+    document.getElementById("projects-tile").addEventListener("click", (e) => { e.preventDefault(); showTab("projects-tab"); });
+    document.getElementById("gallery-tile").addEventListener("click", (e) => { e.preventDefault(); showTab("gallery-tab"); });
+
+    window.addEventListener("load", () => {
+      showTab("dashboard-tab");
+    });
+  </script>
+
+  <script>
+    // Universal Image Previewer
+    function setupImagePreview(inputId, previewId) {
+      const input = document.getElementById(inputId);
+      const preview = document.getElementById(previewId);
+      if (input) {
+        input.addEventListener("change", function (event) {
+          const file = event.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              preview.src = e.target.result;
+              preview.parentElement.style.display = "block";
+              preview.style.display = 'inline-block';
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+    }
+    setupImagePreview('image-upload', 'selected-image');
+    setupImagePreview('image', 'image-preview'); // For gallery
+  </script>
+
+  <!-- Latest Projects script -->
+  <script>
+    const token = localStorage.getItem("token");
+
+    // Image preview
+    document.getElementById("image-upload").addEventListener("change", function (event) {
+      const file = event.target.files[0];
+      if (file) {
+        document.getElementById("selected-image").src = URL.createObjectURL(file);
+      }
+    });
+
+    // Create project
+    document.getElementById("image-upload-form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const formData = new FormData();
+      formData.append("title", document.getElementById("project-name").value);
+      formData.append("image", document.getElementById("image-upload").files[0]);
+      formData.append("location", document.getElementById("project-location").value);
+      formData.append("description", document.getElementById("project-description").value);
+
+      try {
+        const response = await fetch("http://localhost:5000/api/latest-projects/add", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          Swal.fire({
+            icon: "success",
+            title: "Project Created!",
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 2000
+          });
+          fetchProjects();
+          this.reset();
+          document.getElementById("selected-image").src = "";
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: result.message,
+          });
+        }
+      } catch (error) {
+        console.error("Create error:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "An error occurred.",
+        });
+      }
+    });
+
+    // Fetch projects
+    async function fetchProjects() {
+      try {
+        const response = await fetch("http://localhost:5000/api/latest-projects/all");
+        const projects = await response.json();
+
+        const container = document.getElementById("project-cards");
+        container.innerHTML = "";
+
+        projects.forEach((project) => {
+          const card = `
+                        <div class="col-12 col-sm-6 col-md-4">
+                          <div class="card h-100 shadow-sm">
+                            <img src="${project.image}" class="card-img-top" alt="Project Image" style="object-fit: cover; height: 180px;">
+                            <div class="card-body d-flex flex-column">
+                              <h5 class="card-title">${project.title}</h5>
+                              <p class="card-text">${project.description || ""}</p>
+                              <p class="card-text"><small class="text-muted">${project.location || ""}</small></p>
+                              <div class="mt-auto d-flex justify-content-between">
+                                <button class="btn btn-warning btn-sm" onclick='openEditModal(${JSON.stringify(project)})'>Edit</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteProject(${project.id})">Delete</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      `;
+          container.innerHTML += card;
+        });
+      } catch (error) {
+        console.error("Fetch error:", error);
+      }
+    }
+
+    // Delete project
+    async function deleteProject(id) {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "This project will be permanently deleted!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const res = await fetch(`http://localhost:5000/api/latest-projects/${id}`, {
+              method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            const result = await res.json();
+            if (res.ok) {
+              Swal.fire({
+                icon: "success",
+                title: "Deleted!",
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 2000
+              });
+              fetchProjects();
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: result.message,
+              });
+            }
+          } catch (err) {
+            console.error("Delete error:", err);
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "An error occurred.",
+            });
+          }
+        }
+      });
+    }
+
+    // Open modal for editing
+    function openEditModal(project) {
+      document.getElementById("edit-project-id").value = project.id;
+      document.getElementById("edit-project-name").value = project.title;
+      document.getElementById("edit-project-location").value = project.location || "";
+      document.getElementById("edit-project-description").value = project.description || "";
+      document.getElementById("edit-project-image").value = "";
+      document.getElementById("edit-project-modal").style.display = "block";
+      document.getElementById("overlay").style.display = "block";
+    }
+
+    // Close modal
+    function closeEditModal() {
+      document.getElementById("edit-project-modal").style.display = "none";
+      document.getElementById("overlay").style.display = "none";
+    }
+
+    // Handle update submit
+    document.getElementById("edit-project-form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const id = document.getElementById("edit-project-id").value;
+      const formData = new FormData();
+      formData.append("title", document.getElementById("edit-project-name").value);
+      formData.append("location", document.getElementById("edit-project-location").value);
+      formData.append("description", document.getElementById("edit-project-description").value);
+
+      const fileInput = document.getElementById("edit-project-image");
+      if (fileInput.files.length > 0) {
+        formData.append("image", fileInput.files[0]);
+      }
+
+      try {
+        const response = await fetch(`http://localhost:5000/api/latest-projects/update/${id}`, {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          Swal.fire({
+            icon: "success",
+            title: "Project Updated!",
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 2000
+          });
+          closeEditModal();
+          fetchProjects();
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Update Error",
+            text: result.message,
+          });
+        }
+      } catch (err) {
+        console.error("Update error:", err);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "An error occurred.",
+        });
+      }
+    });
+
+    // Load projects on page load
+    window.addEventListener("DOMContentLoaded", fetchProjects);
+  </script>
+
+  <!-- Gallery script -->
+  <script>
+    const API_URL = "http://localhost:5000/api/gallery";
+    const apitoken = localStorage.getItem("token");
+
+    function showToast(message, success = true) {
+      Swal.fire({
+        toast: true, position: "top-end", icon: success ? "success" : "error",
+        title: message, showConfirmButton: false, timer: 3000, timerProgressBar: true,
+      });
+    }
+
+    function toggleSpinner(show) {
+      document.getElementById("spinner").style.display = show ? "inline-block" : "none";
+      document.getElementById("submit-text").innerText = show ? "Submitting..." : "Submit to Gallery";
+    }
+
+    const getGalleries = async () => {
+      try {
+        const res = await fetch(`${API_URL}/all`);
+        if (!res.ok) throw new Error("Failed to fetch gallery");
+        const data = await res.json();
+        const container = document.getElementById("galleries");
+        container.innerHTML = "";
+
+        if (data.length === 0) {
+          container.innerHTML = `<p class="text-center text-muted col-span-full">No gallery items found.</p>`;
+          return;
+        }
+
+        data.forEach((item) => {
+          container.innerHTML += `
+            <div class="bg-white shadow-md rounded-lg p-4">
+              <img src="${item.image}" alt="${item.title}" class="w-full h-40 object-cover rounded mb-3">
+              <h3 class="font-semibold text-lg">${item.title}</h3>
+              <p class="text-gray-600 text-sm">${item.content}</p>
+              <div class="mt-4 flex justify-end gap-2">
+                <button onclick="editGallery(${item.id}, '${item.title}', '${item.content}', '${item.image}')" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit me-1"></i>Edit</button>
+                <button onclick="deleteGallery(${item.id})" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash me-1"></i>Delete</button>
+              </div>
+            </div>`;
+        });
+      } catch (err) {
+        console.error("Fetch error:", err);
+        showToast("Failed to load galleries", false);
+      }
+    };
+    window.getGalleries = getGalleries;
+
+    const createGallery = async (e) => {
+      e.preventDefault();
+      const title = document.getElementById("title").value;
+      const content = document.getElementById("content").value;
+      const image = document.getElementById("image").files[0];
+
+      if (!title || !content || !image) {
+        showToast("All fields are required", false);
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("content", content);
+      formData.append("image", image);
+
+      toggleSpinner(true);
+      try {
+        const res = await fetch(`${API_URL}/add`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${apitoken}` }, body: formData,
+        });
+        const result = await res.json();
+        if (res.ok) {
+          showToast("Gallery added successfully");
+          document.getElementById("gallery-form").reset();
+          document.getElementById('image-preview').style.display = 'none';
+          getGalleries();
+        } else {
+          showToast(result.message || "Upload failed", false);
+        }
+      } catch (err) {
+        console.error("Upload error:", err);
+        showToast("Upload failed", false);
+      } finally {
+        toggleSpinner(false);
+      }
+    };
+
+    const editGallery = async (id, title, content, image) => {
+      const { value: formValues } = await Swal.fire({
+        title: "Edit Gallery Item",
+        html: `
+            <input id="swal-title" class="swal2-input" placeholder="Title" value="${title}">
+            <textarea id="swal-content" class="swal2-textarea" placeholder="Content">${content}</textarea>
+            <img src="${image}" alt="Preview" style="max-height: 100px; margin-top: 10px; border-radius: 8px;">
+            <input type="file" id="swal-image" accept="image/*" class="swal2-file mt-3">`,
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: "Update",
+        preConfirm: () => ({
+          updatedTitle: document.getElementById("swal-title").value,
+          updatedContent: document.getElementById("swal-content").value,
+          updatedImage: document.getElementById("swal-image").files[0],
+        }),
+      });
+
+      if (!formValues) return;
+      if (!formValues.updatedTitle || !formValues.updatedContent) {
+        Swal.showValidationMessage("Title and content are required");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("title", formValues.updatedTitle);
+      formData.append("content", formValues.updatedContent);
+      if (formValues.updatedImage) formData.append("image", formValues.updatedImage);
+
+      try {
+        const res = await fetch(`${API_URL}/update/${id}`, {
+          method: "PUT", headers: { Authorization: `Bearer ${apitoken}` }, body: formData,
+        });
+        const result = await res.json();
+        if (res.ok) {
+          showToast("Gallery updated"); getGalleries();
+        } else {
+          showToast(result.message || "Update failed", false);
+        }
+      } catch (err) {
+        console.error("Update error:", err); showToast("Update failed", false);
+      }
+    };
+    window.editGallery = editGallery;
+
+    const deleteGallery = async (id) => {
+      const confirmation = await Swal.fire({
+        title: "Are you sure?", text: "This will permanently delete the gallery item!",
+        icon: "warning", showCancelButton: true, confirmButtonColor: "#d33",
+        cancelButtonColor: "#6c757d", confirmButtonText: "Yes, delete it!",
+      });
+
+      if (!confirmation.isConfirmed) return;
+
+      try {
+        const res = await fetch(`${API_URL}/delete/${id}`, {
+          method: "DELETE", headers: { Authorization: `Bearer ${apitoken}` },
+        });
+        const result = await res.json();
+        if (res.ok) {
+          showToast("Deleted successfully"); getGalleries();
+        } else {
+          showToast(result.message || "Delete failed", false);
+        }
+      } catch (err) {
+        console.error("Delete error:", err); showToast("Delete failed", false);
+      }
+    };
+    window.deleteGallery = deleteGallery;
+
+    // Initialize
+    window.addEventListener('load', () => {
+      getGalleries();
+    });
+    document.getElementById("gallery-form").addEventListener("submit", createGallery);
+  </script>
+
+
+  <!-- logout -->
+  <script>
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      const result = await Swal.fire({
+        title: 'Logout Confirmation',
+        text: 'Are you sure you want to logout?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Yes, logout!'
+      });
+
+      if (result.isConfirmed) {
+        // Clear all stored data
+        localStorage.clear();
+        sessionStorage.clear();
+
+        // Clear any cookies if you're using them
+        document.cookie.split(";").forEach(function (c) {
+          document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+        });
+
+        // Show success message
+        Swal.fire({
+          icon: 'success',
+          title: 'Logged out successfully!',
+          showConfirmButton: false,
+          timer: 1500
+        }).then(() => {
+          // Force redirect
+          window.location.replace("/login.html");
+        });
+      }
+    });
+
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+  
+
+
+
+  async function updateDashboardCounts() {
+  try {
+    // Projects count fetch
+    const projectsResponse = await fetch("http://localhost:5000/api/latest-projects/all");
+    const projects = await projectsResponse.json();
+    const projectsCount = Array.isArray(projects) ? projects.length : 0;
+
+    // Gallery count fetch
+    const galleryResponse = await fetch("http://localhost:5000/api/gallery/all");
+    const gallery = await galleryResponse.json();
+    const galleryCount = Array.isArray(gallery) ? gallery.length : 0;
+
+    // Update the dashboard tile counts
+    document.querySelector('#projects-tile h3').textContent = projectsCount;
+    document.querySelector('#gallery-tile h3').textContent = galleryCount;
+
+  } catch (error) {
+    console.error("Dashboard counts fetch error:", error);
+  }
+}
+// fetchProjects 
+fetchProjects().then(() => updateDashboardCounts());
+
+// getGalleries 
+getGalleries().then(() => updateDashboardCounts());
+async function fetchProjects() {
+  try {
+    const response = await fetch("http://localhost:5000/api/latest-projects/all");
+    const projects = await response.json();
+
+    const container = document.getElementById("project-cards");
+    container.innerHTML = "";
+
+    projects.forEach((project) => {
+      const card = `...`;
+      container.innerHTML += card;
+    });
+
+    // Update dashboard counts
+    updateDashboardCounts();
+
+  } catch (error) {
+    console.error("Fetch error:", error);
+  }
+}
+// const getGalleries = async () => {
+//   try {
+//     const res = await fetch(`${API_URL}/all`);
+//     const data = await res.json();
+//     // rendering logic ...
+//     updateDashboardCounts();
+//   } catch (err) {
+//     // error logic ...
+//   }
+// };
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+
+</html>

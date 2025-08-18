@@ -1,0 +1,390 @@
+
+  :root {
+    --primary-color: #17295b;
+    --primary-hover: #0a58ca;
+    --light-blue: #f0f7ff;
+    --text-dark: #343a40;
+    --text-muted: #6c757d;
+    --bg-light: #f8f9fa;
+    --white: #ffffff;
+    --border-color: #dee2e6;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+  }
+
+  body {
+    background-color: var(--bg-light);
+    font-family: "Poppins", sans-serif;
+    color: var(--text-dark);
+  }
+
+  #wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+  }
+
+  /* --- Sidebar --- */
+  #sidebar-wrapper {
+    min-width: 260px;
+    max-width: 260px;
+    background: var(--white);
+    transition: margin-left 0.35s ease-in-out;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+    z-index: 1000;
+    display: flex;
+    height: 100vh;
+    /* Added for flex layout */
+    flex-direction: column;
+    /* Added for flex layout */
+    /* align-items: center;
+    justify-items: center; */
+  }
+
+  #wrapper.toggled #sidebar-wrapper {
+    margin-left: -260px;
+  }
+
+  .sidebar-heading {
+    padding: 1rem 1.5rem;
+    /* Adjusted padding */
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    display: flex;
+    /* Added for logo alignment */
+    align-items: center;
+    /* Added for logo alignment */
+  }
+
+  .sidebar-logo {
+    /* New style for logo */
+    width: 50px;
+    /* Increased logo size */
+    height: 50px;
+    margin-right: 10px;
+  }
+
+  .user-info {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1rem;
+  }
+
+  .sidebar .list-group-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border: none;
+    font-weight: 500;
+    color: var(--text-muted);
+    background: transparent;
+    padding: 1rem 1.75rem;
+    /* margin: 0.25rem 1rem; */
+    /* border-radius: 0.5rem; */
+    transition: all 0.3s ease;
+  }
+
+  .sidebar .list-group-item i {
+    width: 20px;
+    font-size: 1.1rem;
+    text-align: center;
+  }
+
+  .sidebar .list-group-item:hover {
+    background: var(--light-blue);
+    color: var(--primary-color);
+    transform: translateX(5px);
+  }
+
+  .sidebar .list-group-item.active {
+    background: var(--primary-color);
+    color: var(--white);
+    font-weight: 600;
+    box-shadow: 0 4px 15px -2px rgba(14, 50, 104, 0.4);
+  }
+
+  .btn-danger {
+    margin: 0 1rem;
+    width: calc(100% - 2rem);
+    padding: 0.75rem;
+    font-weight: 600;
+  }
+
+  /* --- Page Content --- */
+  #page-content-wrapper {
+    flex: 1;
+    min-width: 0;
+    transition: margin-left 0.35s ease-in-out;
+  }
+
+  .navbar {
+    padding: 1rem 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  #menu-toggle {
+    border-radius: 0.5rem;
+    color: var(--primary-color);
+    /* Applied directly via class for consistency */
+    border-color: var(--primary-color);
+    /* Applied directly via class for consistency */
+  }
+
+  #menu-toggle i {
+    color: var(--primary-color);
+    /* Applied directly via class for consistency */
+  }
+
+  /* --- Dashboard Tiles --- */
+  .dashboard-tile .glass-card {
+    background: var(--white);
+    border: none;
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .dashboard-tile .glass-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  }
+
+  .dashboard-tile h6 {
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .dashboard-tile h3 {
+    color: var(--text-dark);
+    font-weight: 700;
+    /* Ensured bold */
+    font-size: 2rem;
+    /* Slightly larger for impact */
+  }
+
+  .icon-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    font-size: 1.75rem;
+  }
+
+  .icon-primary {
+    background-color: var(--light-blue);
+    color: var(--primary-color);
+  }
+
+  .icon-warning {
+    background-color: #fff8e1;
+    color: #ffc107;
+  }
+
+  /* --- Forms & Content Sections --- */
+  .tab-pane {
+    padding: 1rem;
+  }
+
+  .tab-pane {
+    max-height: 100vh;
+    /* or 90vh, based on your layout */
+    overflow-y: auto;
+  }
+
+  body {
+    overflow: hidden;
+  }
+
+  .form-container,
+  .content-card {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+    margin-top: 1.5rem;
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+  }
+
+  .form-control {
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .form-control:focus {
+    background-color: var(--white);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+  }
+
+  .btn-primary {
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    background-color: var(--primary-color);
+    /* Ensure primary color */
+    border-color: var(--primary-color);
+    /* Ensure primary color */
+  }
+
+  .btn-primary:hover {
+    background-color: var(--primary-hover);
+    /* Darker on hover */
+    border-color: var(--primary-hover);
+  }
+
+  .btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+
+  .btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: var(--white);
+  }
+
+  .btn-outline-danger {
+    color: #dc3545;
+    border-color: #dc3545;
+  }
+
+  .btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: var(--white);
+  }
+
+
+  /* --- Project Cards --- */
+  #project-cards-container {
+    height: 450px;
+    /* Increased height */
+    overflow-y: auto;
+    overflow-x: hidden;
+    border: none;
+    padding: 1.5rem;
+    background-color: var(--white);
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+    margin-top: 1.5rem;
+  }
+
+  #project-cards .card {
+    border: none;
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    height: 100%;
+  }
+
+  #project-cards .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-img-top {
+    border-radius: 1rem 1rem 0 0;
+  }
+
+  /* --- Gallery Styles --- */
+  #gallery-form {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+  }
+
+  #galleries {
+    padding: 0;
+  }
+
+  #galleries .bg-white {
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+    /* Ensure consistent shadow */
+  }
+
+  #galleries .bg-white:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  }
+
+  /* --- Modal --- */
+  #edit-project-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--white);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.2);
+    z-index: 1050;
+    width: 90%;
+    max-width: 600px;
+    display: none;
+  }
+
+  #overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+    display: none;
+  }
+
+  /* --- Responsive --- */
+  @media (max-width: 992px) {
+    .dashboard-tile {
+      margin-bottom: 1rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    #sidebar-wrapper {
+      margin-left: -260px;
+    }
+
+    #wrapper.toggled #sidebar-wrapper {
+      margin-left: 0;
+    }
+
+    #page-content-wrapper {
+      width: 100%;
+    }
+
+    .form-container,
+    .content-card {
+      padding: 1.5rem;
+    }
+
+    .btn.w-md-50 {
+      /* Custom class for responsive width */
+      width: 100% !important;
+      /* On small screens, take full width */
+    }
+  }
+
+  @media (min-width: 768px) {
+    .btn.w-md-50 {
+      width: 50% !important;
+      /* On medium and larger screens, take 50% width */
+    }
+  }
