@@ -3,82 +3,127 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import Gallery from "./pages/Gallery";
-import RequestQuote from "./pages/RequestQuote";
-import BalconyGlasswork from "./pages/services-page/BalconyGlasswork";
-import WoodenGlassRailing from "./pages/services-page/WoodenGlassRailing";
-import SSRailing from "./pages/services-page/SSRailing";
-import MSRailing from "./pages/services-page/MSRailing";
-import MainGates from "./pages/services-page/MainGates";
-import SecurityDoors from "./pages/services-page/SecurityDoors";
-import CustomFabrication from "./pages/services-page/CustomFabrication";
-import Doors from "./pages/services-page/Doors";
-import Login from "./pages/Login";
-import NotFound from "./pages/NotFound";
-import ScrollToTop from "@/components/ui/ScrollToTop";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
-// --- Admin imports ---
-import AuthGuard from "./components/auth/AuthGuard";
-import MainLayout from "./components/layout/MainLayout";
-import Dashboard from "./pages/Admin/Dashboard";
-import Projects from "./pages/Admin/Project";
-import GalleryAdmin from "./pages/Admin/galleryadmin";
-import SSHandrailWork from "./pages/services-page/SSHandrailWork";
+import Login from "./pages/Login";
+import DashboardLayout from "./components/DashboardLayout";
+import Dashboard from "./pages/Dashboard";
+import People from "./pages/People";
+import AddPerson from "./pages/AddPerson";
+import Books from "./pages/Books";
+import AddBook from "./pages/AddBook";
+import OwnPublishing from "./pages/OwnPublishing";
+import AddOwnPublishing from "./pages/AddOwnPublishing";
+import { AuthProvider } from "./contexts/AuthContext";
+import AddSellingRight from "./pages/AddSellingRight";
+import Reports from "./pages/Reports";
+import AddBuyingRights from "./pages/AddBuyingRights";
+import Agreements from "./pages/Agreements";
+import ScrollToTop from "./components/ui/ScrollToTop";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
       <BrowserRouter>
-        <ScrollToTop />
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Index />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/gallery" element={<Gallery />} />
-          <Route path="/request-quote" element={<RequestQuote />} />
-          <Route path="/services/balcony-glasswork" element={<BalconyGlasswork />} />
-          <Route path="/services/ss-handrail-work" element={<SSHandrailWork />} />
-          <Route path="/services/wooden-with-glass-railing" element={<WoodenGlassRailing />} />
-          <Route path="/services/ss-railing" element={<SSRailing />} />
-          <Route path="/services/ms-railing" element={<MSRailing />} />
-          <Route path="/services/main-gates" element={<MainGates />} />
-          <Route path="/services/security-doors" element={<SecurityDoors />} />
-          <Route path="/services/garden-gates" element={<MainGates />} />
-          <Route path="/services/compound-gates" element={<MainGates />} />
-          <Route path="/services/custom-fabrication" element={<CustomFabrication />} />
-          <Route path="/services/structural-work" element={<CustomFabrication />} />
-          <Route path="/services/industrial-equipment" element={<CustomFabrication />} />
-          <Route path="/services/maintenance" element={<CustomFabrication />} />
-          <Route path="/services/doors" element={<Doors />} />
-          <Route path="/services/windows" element={<Doors />} />
-          <Route path="/services/bathroom-glass" element={<BalconyGlasswork />} />
-          <Route path="/services/exterior-structures" element={<CustomFabrication />} />
+        <AuthProvider>
+          <Toaster />
+          <Sonner />
+          <ScrollToTop />
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/"
+              element={
+                <SidebarProvider>
+                  <DashboardLayout />
+                </SidebarProvider>
+              }
+            >
+              <Route index element={<Dashboard />} />
 
-          {/* Auth Routes */}
-          <Route path="/login" element={<Login />} />
+              {/* People Management */}
+              <Route path="people" element={<People />} />
+              <Route path="people/add" element={<AddPerson />} />
+              <Route path="people/edit/:id" element={<AddPerson />} />
 
-          {/* Admin Routes */}
-          <Route path="/admin" element={
-            <AuthGuard>
-              <MainLayout />
-            </AuthGuard>
-          }>
-            <Route index element={<Dashboard />} />
-            <Route path="projects" element={<Projects />} />
-            <Route path="gallery" element={<GalleryAdmin />} />
-          </Route>
+              {/* Books */}
+              <Route path="books" element={<Books />} />
+              <Route path="books/add" element={<AddBook />} />
+              <Route path="books/edit/:id" element={<AddBook />} />
 
-          {/* Catch-all */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+              {/* Own publishing Management */}
+              <Route path="rights/own-publishing" element={<OwnPublishing />} />
+              <Route
+                path="rights/own-publishing/add"
+                element={<AddOwnPublishing />}
+              />
+              <Route
+                path="rights/own-publishing/edit/:id"
+                element={<AddOwnPublishing />}
+              />
+
+              {/* Rights Management */}
+              <Route
+                path="/rights/selling-rights/add"
+                element={<AddSellingRight />}
+              />
+              <Route
+                path="/rights/buying-rights/add"
+                element={<AddBuyingRights />}
+              />
+              <Route
+                path="/rights/buying-rights/edit/:id"
+                element={<AddBuyingRights />}
+              />
+              <Route
+                path="/rights/selling-rights/edit/:id"
+                element={<AddSellingRight />}
+              />
+
+              {/* Agreements */}
+              <Route path="agreements" element={<Agreements />} />
+              <Route
+                path="agreements/add"
+                element={
+                  <div className="p-6 text-center">
+                    <h2 className="text-2xl font-bold">
+                      Add Agreement - Coming Soon
+                    </h2>
+                  </div>
+                }
+              />
+
+              {/* Other future modules */}
+              <Route path="royalty-calculations" element={<OwnPublishing />} />
+              <Route
+                path="renewals"
+                element={
+                  <div className="p-6 text-center">
+                    <h2 className="text-2xl font-bold">
+                      Agreement Renewals - Coming Soon
+                    </h2>
+                  </div>
+                }
+              />
+              <Route
+                path="settings"
+                element={
+                  <div className="p-6 text-center">
+                    <h2 className="text-2xl font-bold">
+                      Master Settings - Coming Soon
+                    </h2>
+                  </div>
+                }
+              />
+              {/* <Route path="/reports" element={<Reports />} /> */}
+
+              {/* Catch all */}
+              <Route path="*" element={<div>404 Not Found</div>} />
+            </Route>
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

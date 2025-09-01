@@ -1,26 +1,18 @@
-import React from 'react';
-import Navbar from '@/components/Navbar';
-import HeroSection from '@/components/HeroSection';
-import ServicesGrid from '@/components/ServicesGrid';
-import HowWeWork from '@/components/HowWeWork';
-import LatestProjects from '@/components/LatestProjects';
-import Testimonials from '@/components/Testimonials';
-import Footer from '@/components/Footer';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Index = () => {
-  return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <main>
-        <HeroSection />
-        <ServicesGrid />
-        <HowWeWork />
-        <LatestProjects />
-        <Testimonials />
-      </main>
-      <Footer />
-    </div>
-  );
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+    }
+  }, [isAuthenticated, navigate]);
+
+  return null;
 };
 
 export default Index;
