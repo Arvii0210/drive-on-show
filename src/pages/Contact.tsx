@@ -96,21 +96,26 @@ const Contact = () => {
       <Navbar />
 
       {/* Header */}
-      <section className="bg-secondary py-12">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl font-bold text-center">
-            Get in Touch with Aadarsh Enterprise
+      <section className="relative py-24 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-premium opacity-20"></div>
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent" data-aos="fade-up">
+            Get in Touch
           </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+            We're here to help with all your circular loom spare part needs
+          </p>
         </div>
       </section>
 
       {/* Contact Form and Details */}
-      <section className="py-16">
+      <section className="py-20 relative">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-12 max-w-7xl mx-auto">
             {/* Contact Form */}
-            <div>
-              <h2 className="text-2xl font-bold mb-6">Send us a Message</h2>
+            <div className="bg-card/40 backdrop-blur-sm p-8 rounded-3xl shadow-premium border border-border/30" data-aos="fade-right">
+              <h2 className="text-3xl font-bold mb-8 bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">Send us a Message</h2>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <Label htmlFor="name">Name *</Label>
@@ -187,47 +192,53 @@ const Contact = () => {
                   />
                 </div>
 
-                <Button type="submit" className="w-full" size="lg">
-                  Submit Enquiry
+                <Button type="submit" className="w-full group hover:shadow-glow transition-all duration-300" size="lg">
+                  <span className="group-hover:translate-x-1 inline-block transition-transform duration-300">Submit Enquiry</span>
                 </Button>
               </form>
             </div>
 
             {/* Contact Details */}
-            <div>
-              <h2 className="text-2xl font-bold mb-6">Contact Information</h2>
+            <div data-aos="fade-left">
+              <h2 className="text-3xl font-bold mb-8 bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">Contact Information</h2>
               <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <MapPin className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
+                <div className="flex items-start gap-4 p-6 bg-card/40 backdrop-blur-sm rounded-2xl border border-border/30 hover:border-primary/30 transition-all duration-300 group">
+                  <div className="p-3 bg-primary/10 rounded-xl group-hover:bg-primary/20 transition-colors duration-300">
+                    <MapPin className="h-6 w-6 text-primary" />
+                  </div>
                   <div>
-                    <h3 className="font-semibold mb-1">Address</h3>
-                    <p className="text-muted-foreground">
+                    <h3 className="font-semibold mb-2 text-lg">Address</h3>
+                    <p className="text-muted-foreground leading-relaxed">
                       Aadarsh Enterprise<br />
                       Coimbatore, Tamil Nadu, India
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4">
-                  <Mail className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
+                <div className="flex items-start gap-4 p-6 bg-card/40 backdrop-blur-sm rounded-2xl border border-border/30 hover:border-primary/30 transition-all duration-300 group">
+                  <div className="p-3 bg-primary/10 rounded-xl group-hover:bg-primary/20 transition-colors duration-300">
+                    <Mail className="h-6 w-6 text-primary" />
+                  </div>
                   <div>
-                    <h3 className="font-semibold mb-1">Email</h3>
+                    <h3 className="font-semibold mb-2 text-lg">Email</h3>
                     <a
                       href="mailto:mukesh@loomspares.com"
-                      className="text-muted-foreground hover:text-primary transition-colors"
+                      className="text-muted-foreground hover:text-primary transition-colors duration-300"
                     >
                       mukesh@loomspares.com
                     </a>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4">
-                  <Phone className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
+                <div className="flex items-start gap-4 p-6 bg-card/40 backdrop-blur-sm rounded-2xl border border-border/30 hover:border-primary/30 transition-all duration-300 group">
+                  <div className="p-3 bg-primary/10 rounded-xl group-hover:bg-primary/20 transition-colors duration-300">
+                    <Phone className="h-6 w-6 text-primary" />
+                  </div>
                   <div>
-                    <h3 className="font-semibold mb-1">Phone</h3>
+                    <h3 className="font-semibold mb-2 text-lg">Phone</h3>
                     <a
                       href="tel:+919363101958"
-                      className="text-muted-foreground hover:text-primary transition-colors"
+                      className="text-muted-foreground hover:text-primary transition-colors duration-300"
                     >
                       +91-9363101958
                     </a>
@@ -235,16 +246,16 @@ const Contact = () => {
                 </div>
               </div>
 
-              {/* Map Placeholder */}
-              <div className="mt-8 bg-muted rounded-lg h-64 flex items-center justify-center">
-<iframe
-  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3916.4907107218974!2d76.96498997480836!3d11.001761689161043!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba859a63fd65319%3A0x63efcd1bf8024895!2sAdarsh%20Enterprises!5e0!3m2!1sen!2sin!4v1762744630648!5m2!1sen!2sin"
-  className="w-full h-full border-0"
-  allowFullScreen
-  loading="lazy"
-  referrerPolicy="no-referrer-when-downgrade"
-  title="Aadarsh Enterprise Location"
-/>
+              {/* Map */}
+              <div className="mt-8 rounded-3xl overflow-hidden shadow-premium border border-border/30" data-aos="fade-up" data-aos-delay="200">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3916.4907107218974!2d76.96498997480836!3d11.001761689161043!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba859a63fd65319%3A0x63efcd1bf8024895!2sAdarsh%20Enterprises!5e0!3m2!1sen!2sin!4v1762744630648!5m2!1sen!2sin"
+                  className="w-full h-80 border-0"
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Aadarsh Enterprise Location"
+                />
               </div>
             </div>
           </div>

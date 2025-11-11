@@ -60,15 +60,16 @@ const ProductList = () => {
       </section>
 
       {/* Category Header */}
-      <section className="bg-gradient-to-br from-primary/10 via-background to-accent/10 py-12" data-aos="fade-up">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">{category.name}</h1>
-          <p className="text-lg text-muted-foreground max-w-3xl">{category.description}</p>
+      <section className="relative py-20 overflow-hidden" data-aos="fade-up">
+        <div className="absolute inset-0 bg-gradient-premium opacity-20"></div>
+        <div className="container mx-auto px-4 relative z-10">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">{category.name}</h1>
+          <p className="text-xl text-muted-foreground max-w-4xl leading-relaxed">{category.description}</p>
         </div>
       </section>
 
       {/* Products Grid */}
-      <section className="py-16 flex-1">
+      <section className="py-20 flex-1">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {category.products.map((product, index) => (
@@ -78,20 +79,21 @@ const ProductList = () => {
                 data-aos="fade-up"
                 data-aos-delay={index * 50}
               >
-                <div className="group bg-card rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full flex flex-col">
-                  <div className="relative h-56 overflow-hidden">
+                <div className="group relative bg-card/40 backdrop-blur-sm rounded-2xl overflow-hidden shadow-premium hover:shadow-premium-hover transition-all duration-500 hover:-translate-y-2 h-full flex flex-col border border-border/30">
+                  <div className="relative h-64 overflow-hidden">
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                    <div className="absolute bottom-3 left-3 right-3">
-                      <h3 className="text-xl font-bold text-white mb-1">{product.name}</h3>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                    <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/20 transition-colors duration-500"></div>
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <h3 className="text-2xl font-bold text-white mb-1 transform group-hover:translate-x-1 transition-transform duration-300">{product.name}</h3>
                     </div>
                   </div>
-                  <div className="p-5 flex-1 flex flex-col">
-                    <p className="text-muted-foreground mb-4 flex-1 line-clamp-2 text-sm">
+                  <div className="p-6 flex-1 flex flex-col bg-gradient-to-b from-card/80 to-card">
+                    <p className="text-muted-foreground mb-4 flex-1 line-clamp-2 text-sm leading-relaxed">
                       {product.description}
                     </p>
                     <div className="flex items-center justify-between">
@@ -99,8 +101,8 @@ const ProductList = () => {
                         <Package className="h-4 w-4" />
                         <span>{product.sparePartsCount} Parts</span>
                       </div>
-                      <Button size="sm" className="group-hover:bg-primary/90">
-                        View Spares
+                      <Button size="sm" className="group-hover:bg-primary group-hover:shadow-glow transition-all duration-300">
+                        <span className="group-hover:translate-x-1 inline-block transition-transform duration-300">View Spares</span>
                       </Button>
                     </div>
                   </div>

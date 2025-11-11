@@ -108,17 +108,20 @@ const SparePartsList = () => {
       </section>
 
       {/* Product Header */}
-      <section className="bg-gradient-to-br from-primary/10 via-background to-accent/10 py-12" data-aos="fade-up">
-        <div className="container mx-auto px-4">
-          <div className="flex items-start gap-4 mb-4">
-            <Package className="h-10 w-10 text-primary flex-shrink-0 mt-1" />
-            <div>
-              <h1 className="text-3xl md:text-5xl font-bold mb-2">{product.name}</h1>
-              <p className="text-lg text-muted-foreground">{product.description}</p>
+      <section className="relative py-20 overflow-hidden" data-aos="fade-up">
+        <div className="absolute inset-0 bg-gradient-premium opacity-20"></div>
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="flex items-start gap-6 mb-6">
+            <div className="p-4 bg-primary/10 rounded-2xl backdrop-blur-sm">
+              <Package className="h-12 w-12 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">{product.name}</h1>
+              <p className="text-xl text-muted-foreground leading-relaxed">{product.description}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3 text-muted-foreground">
-            <span className="text-sm">Total Parts: {product.spareParts.length}</span>
+          <div className="flex items-center gap-4 text-muted-foreground bg-card/30 backdrop-blur-sm rounded-xl px-6 py-3 border border-border/30 w-fit">
+            <span className="text-sm font-medium">Total Parts: {product.spareParts.length}</span>
             <span>•</span>
             <span className="text-sm">
               Showing {startIndex + 1}-{Math.min(endIndex, product.spareParts.length)} of {product.spareParts.length}
@@ -128,50 +131,53 @@ const SparePartsList = () => {
       </section>
 
       {/* Spare Parts List */}
-      <section className="py-16 flex-1">
+      <section className="py-20 flex-1">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {currentParts.map((part, index) => (
               <div
                 key={part.id}
-                data-aos="fade-down"
+                data-aos="zoom-in"
                 data-aos-delay={index * 50}
-                className="bg-card rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 group"
+                className="bg-card/40 backdrop-blur-sm rounded-2xl overflow-hidden shadow-premium hover:shadow-premium-hover transition-all duration-500 group border border-border/30"
               >
                 <div
-                  className="relative h-48 overflow-hidden cursor-pointer"
+                  className="relative h-56 overflow-hidden cursor-pointer"
                   onClick={() => handleImageClick(index)}
                 >
                   <img
                     src={part.image}
                     alt={part.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-125 transition-transform duration-700"
                   />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">
-                    <Eye className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-primary/20 transition-colors duration-500 flex items-center justify-center">
+                    <div className="bg-white/90 backdrop-blur-sm rounded-full p-4 opacity-0 group-hover:opacity-100 transform scale-75 group-hover:scale-100 transition-all duration-300">
+                      <Eye className="h-6 w-6 text-primary" />
+                    </div>
                   </div>
-                  <Badge className={`absolute top-3 right-3 ${availabilityColor(part.availability)}`}>
+                  <Badge className={`absolute top-3 right-3 ${availabilityColor(part.availability)} backdrop-blur-sm`}>
                     {part.availability}
                   </Badge>
                 </div>
-                <div className="p-5">
-                  <div className="mb-2">
-                    <span className="text-xs font-mono text-muted-foreground bg-muted px-2 py-1 rounded">
+                <div className="p-6 bg-gradient-to-b from-card/80 to-card">
+                  <div className="mb-3">
+                    <span className="text-xs font-mono text-muted-foreground bg-muted/50 backdrop-blur-sm px-3 py-1.5 rounded-full">
                       {part.partNo}
                     </span>
                   </div>
-                  <h3 className="font-bold text-lg mb-2 line-clamp-1">{part.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{part.description}</p>
+                  <h3 className="font-bold text-lg mb-2 line-clamp-1 group-hover:text-primary transition-colors duration-300">{part.name}</h3>
+                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2 leading-relaxed">{part.description}</p>
                   {part.category && (
-                    <p className="text-xs text-muted-foreground">Cat: {part.category}</p>
+                    <p className="text-xs text-muted-foreground mb-3">Category: {part.category}</p>
                   )}
                   <Button
                     size="sm"
-                    className="w-full mt-4"
+                    className="w-full mt-2 group-hover:shadow-glow transition-all duration-300"
                     onClick={() => handleImageClick(index)}
                   >
                     <Eye className="h-4 w-4 mr-2" />
-                    View Image
+                    <span className="group-hover:translate-x-1 inline-block transition-transform duration-300">View Image</span>
                   </Button>
                 </div>
               </div>
