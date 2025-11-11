@@ -24,53 +24,60 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-card border-b border-border shadow-sm">
+    <nav className="sticky top-0 z-50 w-full bg-card/80 backdrop-blur-xl border-b border-border/50 shadow-sm">
       <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
-          {/* Logo and Company Name */}
-          <Link to="/" className="flex items-center gap-3">
-            <img src={aeLogo} alt="Aadarsh Enterprise Logo" className="h-[60px] w-16" />
+        <div className="flex h-20 items-center justify-between">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-3 group">
+            <img 
+              src={aeLogo} 
+              alt="Aadarsh Enterprise Logo" 
+              className="h-16 w-20 transition-transform duration-300 group-hover:scale-105" 
+            />
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
-                className="text-foreground hover:text-primary transition-colors font-medium"
+                className="text-foreground hover:text-primary transition-colors font-medium relative group"
               >
                 {link.name}
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
               </Link>
             ))}
 
             {/* Products Dropdown */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 text-foreground hover:text-primary transition-colors font-medium">
+              <DropdownMenuTrigger className="flex items-center gap-1 text-foreground hover:text-primary transition-colors font-medium group">
                 Products
-                <ChevronDown className="h-4 w-4" />
+                <ChevronDown className="h-4 w-4 transition-transform group-hover:rotate-180 duration-300" />
               </DropdownMenuTrigger>
 
               <DropdownMenuContent
                 align="start"
-                sideOffset={8}
-                className="w-56 bg-[#3b2b24] text-[#e9d9c8] rounded-lg shadow-2xl py-2 border border-[#4a372f] z-50 divide-y divide-[#4a372f] overflow-hidden"
+                sideOffset={12}
+                className="w-64 rounded-2xl shadow-xl border border-border/50 bg-card/95 backdrop-blur-xl p-2"
               >
                 {productLinks.map((link) => (
-                  <DropdownMenuItem key={link.path} asChild className="p-0">
+                  <DropdownMenuItem key={link.path} asChild className="rounded-xl">
                     <Link
                       to={link.path}
-                      className="block px-4 py-3 text-sm font-medium text-[#e9d9c8] hover:bg-[#4a352b] hover:text-white transition-colors"
+                      className="block px-4 py-3 text-sm font-medium text-foreground hover:bg-primary/10 hover:text-primary transition-all duration-200"
                     >
                       {link.name}
                     </Link>
                   </DropdownMenuItem>
                 ))}
 
-                <div className="py-2 px-3 text-xs text-[#c7b59f]">
-                  <div className="mb-1">More</div>
-                  <Link to="/products" className="block text-sm text-[#d7c4b7] hover:underline">
-                    View all products
+                <div className="mt-2 pt-2 border-t border-border/50">
+                  <Link 
+                    to="/products" 
+                    className="block px-4 py-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    View all products →
                   </Link>
                 </div>
               </DropdownMenuContent>
@@ -78,13 +85,17 @@ const Navbar = () => {
 
             <Link
               to="/contact"
-              className="text-foreground hover:text-primary transition-colors font-medium"
+              className="text-foreground hover:text-primary transition-colors font-medium relative group"
             >
               Contact
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
             </Link>
 
-            {/* Call Now Button */}
-            <Button asChild className="bg-primary hover:bg-primary/90">
+            {/* Call Button */}
+            <Button 
+              asChild 
+              className="bg-primary hover:bg-primary/90 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+            >
               <a href="tel:+919363101958" className="flex items-center gap-2">
                 <Phone className="h-4 w-4 phone-shake" aria-hidden="true" />
                 <span>Call Now</span>
@@ -94,7 +105,7 @@ const Navbar = () => {
 
           {/* Mobile Navigation */}
           <div className="md:hidden flex items-center gap-2">
-            <Button asChild size="sm" className="bg-primary hover:bg-primary/90">
+            <Button asChild size="sm" className="bg-primary hover:bg-primary/90 rounded-full">
               <a href="tel:+919363101958" aria-label="Call Aadarsh Enterprise">
                 <Phone className="h-4 w-4 phone-shake" />
               </a>
@@ -102,7 +113,7 @@ const Navbar = () => {
 
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label="Open menu">
+                <Button variant="ghost" size="icon" aria-label="Open menu" className="rounded-full">
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
