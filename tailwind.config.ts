@@ -64,9 +64,25 @@ export default {
           footer: "hsl(var(--brand-footer))",
           text: "hsl(var(--brand-text))",
         },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
       },
       fontFamily: {
-        sans: ['Poppins', 'Roboto', 'sans-serif'],
+        sans: ['Inter', 'SF Pro Display', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+      },
+      backgroundImage: {
+        'gradient-premium': 'var(--gradient-premium)',
+        'gradient-primary': 'var(--gradient-primary)',
+        'gradient-secondary': 'var(--gradient-secondary)',
+        'gradient-accent': 'var(--gradient-accent)',
+        'gradient-hero': 'var(--gradient-hero)',
+      },
+      boxShadow: {
+        'premium': 'var(--shadow-premium)',
+        'premium-hover': 'var(--shadow-premium-hover)',
+        'glow': 'var(--shadow-glow)',
       },
       borderRadius: {
         lg: "var(--radius)",

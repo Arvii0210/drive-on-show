@@ -14,7 +14,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Mail, MapPin, Phone, Send } from "lucide-react";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const Contact = () => {
   const [searchParams] = useSearchParams();
@@ -29,6 +31,12 @@ const Contact = () => {
   });
 
   useEffect(() => {
+    AOS.init({
+      duration: 800,
+      once: true,
+      easing: "ease-out-cubic"
+    });
+    
     const productParam = searchParams.get("product");
     if (productParam) {
       setFormData((prev) => ({ ...prev, product: "Other", message: `Inquiry about: ${productParam}\n\n` }));
@@ -96,16 +104,21 @@ const Contact = () => {
       <Navbar />
 
       {/* Header */}
-      <section className="relative py-24 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-premium opacity-20"></div>
-        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+      <section className="relative py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-100 via-pink-100 to-orange-100 dark:from-purple-950/20 dark:via-pink-950/20 dark:to-orange-950/20"></div>
+        <div className="absolute inset-0 bg-grid-pattern opacity-30"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-premium opacity-20 rounded-full blur-3xl"></div>
         <div className="container mx-auto px-4 text-center relative z-10">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent" data-aos="fade-up">
+          <div data-aos="zoom-in" className="inline-block px-6 py-3 glass-card rounded-full mb-8 border border-purple-500/30">
+            <span className="text-sm font-semibold uppercase tracking-wider bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Contact Us</span>
+          </div>
+          <h1 className="text-6xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent" data-aos="fade-up">
             Get in Touch
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+          <p className="text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed" data-aos="fade-up" data-aos-delay="100">
             We're here to help with all your circular loom spare part needs
           </p>
+          <div className="w-32 h-1.5 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 mx-auto mt-8 rounded-full" data-aos="fade-up" data-aos-delay="200"></div>
         </div>
       </section>
 
@@ -114,8 +127,13 @@ const Contact = () => {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 max-w-7xl mx-auto">
             {/* Contact Form */}
-            <div className="bg-card/40 backdrop-blur-sm p-8 rounded-3xl shadow-premium border border-border/30" data-aos="fade-right">
-              <h2 className="text-3xl font-bold mb-8 bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">Send us a Message</h2>
+            <div className="glass-card p-10 rounded-3xl shadow-premium border-2 border-purple-500/20 hover:border-purple-500/40 transition-all duration-500 group" data-aos="fade-right">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+                  <Send className="h-6 w-6 text-white" />
+                </div>
+                <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Send us a Message</h2>
+              </div>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <Label htmlFor="name">Name *</Label>
@@ -192,19 +210,20 @@ const Contact = () => {
                   />
                 </div>
 
-                <Button type="submit" className="w-full group hover:shadow-glow transition-all duration-300" size="lg">
+                <Button type="submit" className="w-full group hover:shadow-glow transition-all duration-500 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 border-0 h-14 text-lg font-semibold rounded-2xl" size="lg">
                   <span className="group-hover:translate-x-1 inline-block transition-transform duration-300">Submit Enquiry</span>
+                  <Send className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
                 </Button>
               </form>
             </div>
 
             {/* Contact Details */}
             <div data-aos="fade-left">
-              <h2 className="text-3xl font-bold mb-8 bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">Contact Information</h2>
+              <h2 className="text-4xl font-bold mb-10 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Contact Information</h2>
               <div className="space-y-6">
-                <div className="flex items-start gap-4 p-6 bg-card/40 backdrop-blur-sm rounded-2xl border border-border/30 hover:border-primary/30 transition-all duration-300 group">
-                  <div className="p-3 bg-primary/10 rounded-xl group-hover:bg-primary/20 transition-colors duration-300">
-                    <MapPin className="h-6 w-6 text-primary" />
+                <div className="flex items-start gap-5 p-7 glass-card rounded-2xl border-2 border-purple-500/20 hover:border-purple-500/40 transition-all duration-500 hover:shadow-premium group hover:-translate-y-1">
+                  <div className="p-4 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                    <MapPin className="h-7 w-7 text-white" />
                   </div>
                   <div>
                     <h3 className="font-semibold mb-2 text-lg">Address</h3>
@@ -215,9 +234,9 @@ const Contact = () => {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4 p-6 bg-card/40 backdrop-blur-sm rounded-2xl border border-border/30 hover:border-primary/30 transition-all duration-300 group">
-                  <div className="p-3 bg-primary/10 rounded-xl group-hover:bg-primary/20 transition-colors duration-300">
-                    <Mail className="h-6 w-6 text-primary" />
+                <div className="flex items-start gap-5 p-7 glass-card rounded-2xl border-2 border-blue-500/20 hover:border-blue-500/40 transition-all duration-500 hover:shadow-premium group hover:-translate-y-1">
+                  <div className="p-4 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                    <Mail className="h-7 w-7 text-white" />
                   </div>
                   <div>
                     <h3 className="font-semibold mb-2 text-lg">Email</h3>
@@ -230,9 +249,9 @@ const Contact = () => {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4 p-6 bg-card/40 backdrop-blur-sm rounded-2xl border border-border/30 hover:border-primary/30 transition-all duration-300 group">
-                  <div className="p-3 bg-primary/10 rounded-xl group-hover:bg-primary/20 transition-colors duration-300">
-                    <Phone className="h-6 w-6 text-primary" />
+                <div className="flex items-start gap-5 p-7 glass-card rounded-2xl border-2 border-green-500/20 hover:border-green-500/40 transition-all duration-500 hover:shadow-premium group hover:-translate-y-1">
+                  <div className="p-4 bg-gradient-to-br from-green-600 to-teal-600 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                    <Phone className="h-7 w-7 text-white" />
                   </div>
                   <div>
                     <h3 className="font-semibold mb-2 text-lg">Phone</h3>
@@ -247,15 +266,18 @@ const Contact = () => {
               </div>
 
               {/* Map */}
-              <div className="mt-8 rounded-3xl overflow-hidden shadow-premium border border-border/30" data-aos="fade-up" data-aos-delay="200">
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3916.4907107218974!2d76.96498997480836!3d11.001761689161043!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba859a63fd65319%3A0x63efcd1bf8024895!2sAdarsh%20Enterprises!5e0!3m2!1sen!2sin!4v1762744630648!5m2!1sen!2sin"
-                  className="w-full h-80 border-0"
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="Aadarsh Enterprise Location"
-                />
+              <div className="mt-10 rounded-3xl overflow-hidden shadow-premium-hover border-2 border-purple-500/30 hover:border-purple-500/50 transition-all duration-500 group" data-aos="fade-up" data-aos-delay="200">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-premium opacity-10 z-10 pointer-events-none group-hover:opacity-20 transition-opacity duration-500"></div>
+                  <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3916.4907107218974!2d76.96498997480836!3d11.001761689161043!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba859a63fd65319%3A0x63efcd1bf8024895!2sAdarsh%20Enterprises!5e0!3m2!1sen!2sin!4v1762744630648!5m2!1sen!2sin"
+                    className="w-full h-96 border-0"
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="Aadarsh Enterprise Location"
+                  />
+                </div>
               </div>
             </div>
           </div>
